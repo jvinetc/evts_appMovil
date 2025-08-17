@@ -1,57 +1,64 @@
+import { useRouter } from 'expo-router';
 import React from 'react';
 import { StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 
 interface LoginFormProps {
-  email: string;
-  setEmail: (value: string) => void;
-  password: string;
-  setPassword: (value: string) => void;
-  handleSubmit: () => void;
+    email: string;
+    setEmail: (value: string) => void;
+    password: string;
+    setPassword: (value: string) => void;
+    handleSubmit: () => void;
 }
 
-const LoginForm: React.FC<LoginFormProps> = ({email, setEmail, password, setPassword, handleSubmit}) => {
-  return (
-    <View style={styles.container}>
-                    {/* Email */}
-                    <View style={styles.inputContainer}>
-                        <Icon name="email-outline" size={24} color="#007B8A" />
-                        <TextInput placeholder="Correo"
-                            value={email}
-                            onChangeText={setEmail}
-                            autoCapitalize='none' // Evita que se capitalicen las letras
-                            autoCorrect={false} // Desactiva la autocorrección
-                            keyboardType="email-address" style={styles.input} />
-                    </View>
-    
-                    {/* Password */}
-                    <View style={styles.inputContainer}>
-                        <Icon name="lock-outline" size={24} color="#007B8A" />
-                        <TextInput placeholder="Contraseña"
-                            secureTextEntry
-                            style={styles.input} value={password}
-                            onChangeText={setPassword}
-                            autoCapitalize='none' // Evita que se capitalicen las letras
-                            autoCorrect={false} // Desactiva la autocorrección
-                        />
-                    </View>
-    
-                    {/* Botón */}
-                    <TouchableOpacity style={styles.button} onPress={handleSubmit}>
-                        <Text style={styles.buttonText} >Iniciar sesión</Text>
-                    </TouchableOpacity>
-    
-                    {/* Link simple */}
-                    <Text style={styles.link}>¿Olvidaste tu contraseña?</Text>
-    
-                    {/* Link resaltado */}
-                    <Text style={styles.linkResaltado}>¿No tienes cuenta? Regístrate</Text>
-                </View>
-  )
+const LoginForm: React.FC<LoginFormProps> = ({ email, setEmail, password, setPassword, handleSubmit }) => {
+    const router = useRouter();
+    return (
+        <View style={styles.container}>
+            {/* Email */}
+            <View style={styles.inputContainer}>
+                <Icon name="email-outline" size={24} color="#007B8A" />
+                <TextInput placeholder="Correo"
+                    placeholderTextColor="#7f8c8d"
+                    value={email}
+                    onChangeText={setEmail}
+                    autoCapitalize='none' // Evita que se capitalicen las letras
+                    autoCorrect={false} // Desactiva la autocorrección
+                    keyboardType="email-address" style={styles.input} />
+            </View>
+
+            {/* Password */}
+            <View style={styles.inputContainer}>
+                <Icon name="lock-outline" size={24} color="#007B8A" />
+                <TextInput placeholder="Contraseña"
+                    placeholderTextColor="#7f8c8d"
+                    secureTextEntry={true}
+                    style={styles.input} value={password}
+                    onChangeText={setPassword}
+                    autoCapitalize='none' // Evita que se capitalicen las letras
+                    autoCorrect={false} // Desactiva la autocorrección
+                />
+            </View>
+
+            {/* Botón */}
+            <TouchableOpacity style={styles.button} onPress={handleSubmit}>
+                <Text style={styles.buttonText} >Iniciar sesión</Text>
+            </TouchableOpacity>
+
+            {/* Link simple */}
+            <TouchableOpacity onPress={() => console.log('olvidaste la contasenia')}>
+                <Text style={styles.link}>¿Olvidaste tu contraseña?</Text>
+            </TouchableOpacity>
+            {/* Link resaltado */}
+            <TouchableOpacity onPress={() => router.push('/screen/RegisterScreen')}>
+                <Text style={styles.linkResaltado}>¿No tienes cuenta? Regístrate</Text>
+            </TouchableOpacity>
+        </View>
+    )
 }
 
 const styles = StyleSheet.create({
-     container: {
+    container: {
         flex: 1,
         backgroundColor: '#fff',
         alignItems: 'center',
@@ -71,7 +78,8 @@ const styles = StyleSheet.create({
     input: {
         flex: 1,
         marginLeft: 10,
-        paddingVertical: 8
+        paddingVertical: 8,
+        color: '#2c3e50'
     },
     button: {
         backgroundColor: '#007B8A',

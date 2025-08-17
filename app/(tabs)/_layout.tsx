@@ -4,7 +4,7 @@ import { useUserContext } from "@/context/UserContext";
 import { Ionicons } from "@expo/vector-icons";
 import { Tabs } from "expo-router";
 import { StyleSheet, Text, View } from "react-native";
-import LoginScreen from '../../components/LoginScreen';
+import LoginScreen from "../screen/LoginScreen";
 
 export default function TabLayout() {
     const { isLoggedIn } = useUserContext(); // Obtiene el estado de autenticación del contexto
@@ -51,14 +51,14 @@ export default function TabLayout() {
                         tabBarIcon: ({ color, size }) =>
                             (<Ionicons name="storefront" color={color} size={size} />)
                     }} />
-                    <Tabs.Screen name="screen/AgendarScreen"
+                <Tabs.Screen name="screen/AgendarScreen"
                     options={{
                         title: "Agendar",
                         headerShown: false,
                         tabBarIcon: ({ color, size }) =>
                             (<Ionicons name="calendar" color={color} size={size} />)
                     }} />
-                    <Tabs.Screen name="screen/ConfigScreen"
+                <Tabs.Screen name="screen/ConfigScreen"
                     options={{
                         title: "Configuración",
                         headerShown: false,

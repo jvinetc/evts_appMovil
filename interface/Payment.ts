@@ -1,4 +1,4 @@
-export interface VerifyResponse {
+export interface IPayment {
     id?:number;
     amount?: number;
     status?: string;
@@ -10,5 +10,4 @@ export interface VerifyResponse {
     createAt?:Date; 
     sellId?:number;
     sessionId?:string;
-    returnUrl?:string;
 }

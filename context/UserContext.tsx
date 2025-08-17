@@ -2,8 +2,8 @@ import { UserData } from '@/interface/User';
 import React, { createContext, ReactNode, useState } from 'react';
 
 interface UserContextType {
-    user: UserData | null;
-    setUser: (user: UserData | null) => void;
+    user: UserData | undefined;
+    setUser: (user: UserData | undefined) => void;
     isLoggedIn: boolean;
     setIsLoggedIn: (isLoggedIn: boolean) => void;
 }
@@ -11,7 +11,7 @@ interface UserContextType {
 const UserContext = createContext<UserContextType | undefined>(undefined);
 
 export const UserProvider = ({children}:{children: ReactNode}) => {
-    const [user, setUser] = useState<UserData | null>(null);
+    const [user, setUser] = useState<UserData | undefined>(undefined);
     const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false);
 
   return (

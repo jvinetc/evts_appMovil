@@ -14,6 +14,6 @@ export const disableSell=(data: SellData, token: string) =>
     api.put('/sell/disable', data, {
     headers: { Authorization: `Bearer ${token}` }
 });
-export const updateStop=(data: SellData, token: string) => api.put('/ell', data, {
+export const updateSell=(data: SellData, token: string) => api.put('/sell', data, {
     headers: { Authorization: `Bearer ${token}` }
 });

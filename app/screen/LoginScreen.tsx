@@ -1,13 +1,13 @@
 import { UserData } from "@/interface/User";
 import { useState } from "react";
 //import { Button, StyleSheet, Text, TextInput, View } from 'react-native';
+import { login } from "@/api/User";
+import Header from "@/components/Header";
 import LoginForm from "@/components/LoginForm";
 import { useToken } from "@/context/TokenContext";
 import { useUserContext } from "@/context/UserContext";
 import { useRouter } from "expo-router";
-import { StyleSheet, Text } from 'react-native';
-import { login } from "../api/User";
-import Header from "./Header";
+import { Alert, StyleSheet, Text } from 'react-native';
 
 export default function LoginScreen() {
     const [email, setEmail] = useState('');
@@ -35,7 +35,8 @@ export default function LoginScreen() {
             router.push('/(tabs)/screen/HomeScreen'); // Redirige a la pantalla de inicio
         } catch (error) {
             setError("Error al iniciar sesion");
-            console.error(error);
+            Alert.alert('Error', 'No fue posible iniciar sesion, intentalo mas tarde, y si no las has hecho, verifica tu correo');
+            console.log(error);
         }
 
 
@@ -51,6 +52,7 @@ export default function LoginScreen() {
                 setPassword={setPassword}
                 handleSubmit={handleSubmit}
             />
+            
             {error ? <Text style={styles.error}>{error}</Text> : null}
             {message ? <Text style={styles.success}>{message}</Text> : null}
         </>

@@ -12,6 +12,9 @@ export default function RootLayout() {
           <View style={{ flex: 1 }}>
             <Stack screenOptions={{ headerShown: false }} >
               <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+              <Stack.Screen name="screen/RegisterScreen" options={{ headerShown: false }} />
+              <Stack.Screen name="screen/LoginScreen" options={{ headerShown: false }} />
+              <Stack.Screen name="screen/payment_success" options={{ headerShown: false }} />
             </Stack>
           </View>
         </TokenProvider>

@@ -1,5 +1,5 @@
 import { UserData } from '@/interface/User';
-import { useNavigation } from '@react-navigation/native';
+import { useRouter } from 'expo-router';
 import React from 'react';
 import { Dimensions, Image, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
@@ -11,8 +11,8 @@ interface HeaderProps {
   current?: string; // Prop opcional para indicar si es la pantalla actual
 }
 export default function Header({ title, isLoggedIn, user, current }: HeaderProps) {
-  const navigation = useNavigation();
-  const API_URL= process.env.EXPO_PUBLIC_API_SERVER;
+  const API_URL = process.env.EXPO_PUBLIC_API_SERVER;
+  const router = useRouter();
   return (
     <View style={current === "Home" ? styles.header : styles.headerPerfil}>
       {current === "Home" || !isLoggedIn ?
@@ -24,12 +24,12 @@ export default function Header({ title, isLoggedIn, user, current }: HeaderProps
                 uri: 'https://tse2.mm.bing.net/th/id/OIP.SPitBW3YurFj2aUt13oM0wHaEn?r=0&rs=1&pid=ImgDetMain&o=7&rm=3'
               }}
                 style={styles.avatar} />
-              <View style={{ marginTop: 30 }}>
-                <Text style={styles.welcome}>Tienda, </Text>
-                <Text style={styles.subtitle}> {user.Sells !== undefined ? user.Sells[0].name : user.username}</Text>
+              <View style={{ marginTop: 30, marginLeft: 20 }}>
+                <Text style={styles.welcome}>{user.Sells && user.Sells.length === 0 ? 'Usuraio,' : 'Tienda,'} </Text>
+                <Text style={styles.subtitle}> {user.Sells && user.Sells.length > 0 ? user.Sells[0].name : user.username}</Text>
               </View>
 
-              <TouchableOpacity style={styles.perfilLink} onPress={() => navigation.navigate('Profile' as never)}>
+              <TouchableOpacity style={styles.perfilLink} onPress={() => router.navigate('/screen/ConfigScreen')}>
                 <Text style={styles.perfilText}>Mi Perfil</Text>
               </TouchableOpacity>
             </View>

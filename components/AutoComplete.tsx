@@ -1,16 +1,20 @@
 import { autocomplete } from '@/api/AddresApi';
+import { SellData } from '@/interface/Sell';
 import { StopData } from '@/interface/Stop';
 import React, { useEffect } from 'react';
 import { StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 
 interface AutoCompleteProps {
     handleSelect: (placeId: string, address: string) => Promise<void>;
-    stop: StopData | undefined;
-    setStop: React.Dispatch<React.SetStateAction<StopData | undefined>>;
+    data: StopData | SellData | undefined;
+    setData: React.Dispatch<React.SetStateAction<StopData | SellData | undefined>>;
     blockAutocomplete: boolean;
     setBlockAutocomplete: React.Dispatch<React.SetStateAction<boolean>>;
     setSuggestions: React.Dispatch<React.SetStateAction<Suggestion[]>>;
     suggestions: Suggestion[];
+    placeHolder: string;
+    isEdit:boolean;
 }
 type Suggestion = {
     placePrediction: {
@@ -20,7 +24,7 @@ type Suggestion = {
         };
     };
 };
-const AutoComplete: React.FC<AutoCompleteProps> = ({handleSelect, stop, setStop, blockAutocomplete, setBlockAutocomplete, setSuggestions, suggestions}) => {
+const AutoComplete: React.FC<AutoCompleteProps> = ({ handleSelect, data, setData, blockAutocomplete, setBlockAutocomplete, setSuggestions, suggestions, placeHolder, isEdit }) => {
 
     useEffect(() => {
         const fetchSuggestions = async () => {
@@ -28,12 +32,12 @@ const AutoComplete: React.FC<AutoCompleteProps> = ({handleSelect, stop, setStop,
                 setBlockAutocomplete(false);
                 return;
             }
-            if (stop?.addres && stop.addres.length < 3) return; // evita llamadas innecesarias
+            if (data?.addres && data.addres.length < 3) return; // evita llamadas innecesarias
 
             try {
-                if (stop?.addres) {
-                    const { data } = await autocomplete(stop.addres);
-                    const suggestions = data.data.suggestions;
+                if (data?.addres) {
+                    const { data: dt } = await autocomplete(data.addres);
+                    const suggestions = dt.data.suggestions;
                     if (!suggestions) {
                         setSuggestions([]);
                     } else {
@@ -45,13 +49,18 @@ const AutoComplete: React.FC<AutoCompleteProps> = ({handleSelect, stop, setStop,
             }
         };
         fetchSuggestions();
-    }, [stop?.addres]);
+    }, [data?.addres]);
 
     return (
-        <View style={styles.fieldContainer}>
-            <TextInput style={styles.input} value={stop?.addres}
-                onChangeText={(text) => setStop({ ...stop, addres: text })}
-                placeholder='Direccion...' />
+        <View style={[styles.fieldContainer]}>
+            <View style={styles.inputContainer}>
+                <Icon name="google-maps" size={24} color="#007B8A" />
+                <TextInput style={styles.input} value={data?.addres}
+                    onChangeText={(text) => setData({ ...data, addres: text })}
+                    placeholder={placeHolder}
+                    placeholderTextColor="#7f8c8d" 
+                    editable={isEdit}/>
+            </View>
             {suggestions.map((s) => (
                 <TouchableOpacity
                     key={s.placePrediction.placeId}
@@ -61,10 +70,23 @@ const AutoComplete: React.FC<AutoCompleteProps> = ({handleSelect, stop, setStop,
                     <Text>{s.placePrediction.text.text}</Text>
                 </TouchableOpacity>
             ))}
-        </View>    )
+        </View>)
 }
 
 const styles = StyleSheet.create({
+    inputContainer: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        borderBottomWidth: 1,
+        borderColor: '#007B8A',
+        marginBottom: 20,
+    },
+    input: {
+        flex: 1,
+        marginLeft: 10,
+        paddingVertical: 3,
+        color: '#2c3e50'
+    },
     container: {
         flex: 1,
         padding: 24,
@@ -80,12 +102,13 @@ const styles = StyleSheet.create({
         marginBottom: 6,
         textAlign: 'center',
     },
-    input: {
+    /* input: {
         backgroundColor: '#fff',
         borderRadius: 12,
         padding: 12,
         fontSize: 16,
-    },
+        color: '#2c3e50'
+    }, */
     buttonRow: {
         flexDirection: 'row',
         justifyContent: 'space-around',

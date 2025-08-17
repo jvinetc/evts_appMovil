@@ -17,6 +17,7 @@ export interface UserData {
     createAt?: string;
     updateAt?: string;
     verification_token?: string;
+    birthDate?: string;
     Sells?: SellData[];
     Rol?: IRole;
     Images?: ImagesData[];

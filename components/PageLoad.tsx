@@ -3,12 +3,7 @@ import { ActivityIndicator, StyleSheet, Text, View } from 'react-native';
 
 const PageLoad = () => {
   return (
-    <View style={styles.container}>
-      <View style={styles.logoContainer}>
-        <Text style={styles.logoText}>Envios todo santiago</Text>
-        {/* Puedes usar una imagen también */}
-        {/* <Image source={require('../assets/logo.png')} style={styles.logo} /> */}
-      </View>
+    <View style={styles.overlay}>
       <ActivityIndicator size="large" color="#007B8A" />
       <Text style={styles.loadingText}>Cargando...</Text>
     </View>
@@ -16,24 +11,22 @@ const PageLoad = () => {
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#F5F5DC',
+   overlay: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    zIndex: 999, // Asegura que esté encima de todo
     justifyContent: 'center',
-    alignItems: 'center'
-  },
-  logoContainer: {
-    marginBottom: 20
-  },
-  logoText: {
-    fontSize: 32,
-    fontWeight: 'bold',
-    color: '#007B8A'
+    alignItems: 'center',
+    backgroundColor: 'rgba(245, 245, 220, 0.5)', // Beige semitransparente
   },
   loadingText: {
     marginTop: 10,
-    color: '#007B8A'
-  }
+    color: '#007B8A',
+    fontWeight: '600',
+  },
 });
 
 export default PageLoad
