@@ -1,12 +1,14 @@
 import { listStopByUser } from '@/api/Stops';
 import Header from '@/components/Header';
 import HistorialCompras from '@/components/HistorialCompras';
+import ModalPedidos from '@/components/ModalPedidos';
 import PayButton from '@/components/PayButton';
 import { useLoading } from '@/context/LoadingContext';
 import { useToken } from '@/context/TokenContext';
 import { useUserContext } from '@/context/UserContext';
 import { StopData } from '@/interface/Stop';
 import { MaterialIcons } from '@expo/vector-icons';
+import { useIsFocused } from '@react-navigation/native';
 import React, { useEffect, useState } from 'react';
 import { Alert, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
@@ -14,16 +16,20 @@ import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 const ProfileScreen = () => {
     const [stops, setStops] = useState<StopData[] | null>(null);
     const [porPagar, setPorPagar] = useState<StopData[] | null>(null);
+    const [stopsModal, setStopsModal] = useState<StopData[] | null>(null);
     const [entregados, setEntregados] = useState<StopData[] | null>(null);
     const [pendientes, setPendientes] = useState<StopData[] | null>(null);
     const [enRetiro, setEnRetiro] = useState<StopData[] | null>(null);
     const [total, setTotal] = useState(0);
-    const  [viewHistory, setViewHistory]= useState(false);
+    const [viewHistory, setViewHistory] = useState(false);
+    const [viewDetail, setViewDetail] = useState(false);
+    const [title, setTitle] = useState('');
     const { user } = useUserContext();
     const { token } = useToken();
     const { setLoading } = useLoading();
+    const isFocused = useIsFocused();
     useEffect(() => {
-        const loadStops = async () => {            
+        const loadStops = async () => {
             setLoading(true);
             setEnRetiro(null);
             setPendientes(null);
@@ -66,29 +72,47 @@ const ProfileScreen = () => {
             }
         }
         loadStops();
-    }, [user])
+    }, [user, isFocused])
 
     return (
         <View>
             <Header title="Perfil" isLoggedIn={true} current="Profile" user={user} />
             <View style={styles.resumenContainer}>
-                <View style={styles.box}>
-                    <Text style={styles.monto}>{enRetiro?.length || 0}</Text>
-                    <Text style={styles.label}>EN RETIRO</Text>
-                </View>
-                <View style={styles.box}>
-                    <Text style={styles.monto}>{pendientes?.length || 0}</Text>
-                    <Text style={styles.label}>PENDIENTES</Text>
-                </View>
-                <View style={styles.box}>
-                    <Text style={styles.monto}>{entregados?.length || 0}</Text>
-                    <Text style={styles.label}>ENTREGADOS</Text>
-                </View>
+                <TouchableOpacity style={styles.box} onPress={() =>{ 
+                    setTitle('EN RETIRO');
+                    setStopsModal(enRetiro);
+                    setViewDetail(true);
+                }}>
+                    <View>
+                        <Text style={[styles.monto, {alignSelf:'center'}]}>{enRetiro?.length || 0}</Text>
+                        <Text style={styles.label}>EN RETIRO</Text>
+                    </View>
+                </TouchableOpacity>
+                <TouchableOpacity style={styles.box} onPress={() => { 
+                    setTitle('PENDIENTES');
+                    setStopsModal(pendientes);
+                    setViewDetail(true);
+                }}>
+                    <View>
+                        <Text style={[styles.monto, {alignSelf:'center'}]}>{pendientes?.length || 0}</Text>
+                        <Text style={styles.label}>PENDIENTES</Text>
+                    </View>
+                </TouchableOpacity>
+                <TouchableOpacity style={styles.box} onPress={() => { 
+                    setTitle('ENTREGADOS');
+                    setStopsModal(entregados);
+                    setViewDetail(true);
+                }}>
+                    <View >
+                        <Text style={[styles.monto, {alignSelf:'center'}]}>{entregados?.length || 0}</Text>
+                        <Text style={styles.label}>ENTREGADOS</Text>
+                    </View>
+                </TouchableOpacity>
             </View>
 
             {/* Categorías */}
             <Text style={styles.categoriasTitulo}>Categorías</Text>
-            <TouchableOpacity style={styles.categoria} onPress={()=>setViewHistory(true)}>
+            <TouchableOpacity style={styles.categoria} onPress={() => setViewHistory(true)}>
                 <Icon name="cube-outline" size={30} color="#007B8A" style={styles.roundedIcon} />
                 <Text style={styles.categoriaTexto}>Historial de Compras</Text>
                 <MaterialIcons name="keyboard-arrow-right" size={30} color="#888" style={styles.roundedIcon} />
@@ -106,13 +130,20 @@ const ProfileScreen = () => {
 
 
             <View style={styles.resumenContainerP}>
-                <View style={styles.boxP}>
-                    <Text style={styles.monto}>{porPagar?.length || 0}</Text>
-                    <Text style={styles.label}>POR PAGAR</Text>
-                </View>
-                <PayButton total={total} porPagar={porPagar} setPorPagar={setPorPagar} user={user}/>
+                <TouchableOpacity style={styles.boxP} onPress={() =>{ 
+                    setTitle('POR PAGAR');
+                    setStopsModal(porPagar);
+                    setViewDetail(true);
+                }}>
+                    <View>
+                        <Text style={[styles.monto, {alignSelf:'center'}]}>{porPagar?.length || 0}</Text>
+                        <Text style={styles.label}>POR PAGAR</Text>
+                    </View>
+                </TouchableOpacity>
+                <PayButton total={total} porPagar={porPagar} setPorPagar={setPorPagar} user={user} />
             </View>
-            {viewHistory&&<HistorialCompras setViewHistory={setViewHistory} viewHistory={viewHistory} user={user}/>}
+            {viewHistory && <HistorialCompras setViewHistory={setViewHistory} viewHistory={viewHistory} user={user} />}
+            {viewDetail && <ModalPedidos setViewDetail={setViewDetail} stops={stopsModal} title={title} viewDetail={viewDetail} />}
         </View>
     )
 }

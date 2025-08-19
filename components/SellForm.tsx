@@ -7,6 +7,7 @@ import { useToken } from '@/context/TokenContext';
 import { IComuna } from '@/interface/Comuna';
 import { SellData } from '@/interface/Sell';
 import { UserData } from '@/interface/User';
+import { useIsFocused } from '@react-navigation/native';
 import React, { useEffect, useState } from 'react';
 import { Alert, Image, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
@@ -37,6 +38,7 @@ const SellForm = ({ user, setCreate, create, setUser }: sellFormProps) => {
     const { token } = useToken();
     const API_URL = process.env.EXPO_PUBLIC_API_SERVER;
     const [modalVisible, setModalVisible] = useState(false);
+    const isFocused = useIsFocused();
 
     useEffect(() => {
         if (user?.Sells && user.Sells.length === 0) {
@@ -46,7 +48,7 @@ const SellForm = ({ user, setCreate, create, setUser }: sellFormProps) => {
             setBlockAutocomplete(true);
             setIsEdit(false)
         }
-    }, [user]);
+    }, [user, isFocused]);
 
     const handleSelect = async (placeId: string, address: string) => {
         try {

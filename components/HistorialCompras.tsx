@@ -4,8 +4,10 @@ import { useToken } from '@/context/TokenContext';
 import { IPayment } from '@/interface/Payment';
 import { StopData } from '@/interface/Stop';
 import { UserData } from '@/interface/User';
+import { router } from 'expo-router';
 import React, { useEffect, useState } from 'react';
 import { Alert, Modal, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 
 type HistotialProps = {
     viewHistory: boolean;
@@ -80,6 +82,19 @@ const HistorialCompras: React.FC<HistotialProps> = ({ viewHistory, setViewHistor
                                     <Text>Tarjeta: **** {item.card_detail?.slice(-4)}</Text>
                                     <Text>Fecha: {item?.createAt ? new Date(item?.createAt).toLocaleString() :
                                         new Date().toLocaleString().toLocaleString()}</Text>
+
+                                    <TouchableOpacity
+                                        style={styles.iconButton}
+                                        onPress={() => router.push({
+                                            pathname: '/screen/payment_success',
+                                            params: {
+                                                authorization_code: item.authorization_code,
+                                            },
+                                        })}
+                                    >
+                                        <Icon name="file-document-outline" size={24} color="#007B8A" />
+                                        <Text style={styles.iconLabel}>Ver boleta</Text>
+                                    </TouchableOpacity>
                                 </View>
                             ))}
                         </ScrollView>
@@ -164,6 +179,16 @@ const styles = StyleSheet.create({
         color: '#fff',
         fontWeight: '600',
         fontSize: 16,
+    },
+    iconButton: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        marginTop: 10,
+    },
+    iconLabel: {
+        marginLeft: 8,
+        color: '#007B8A',
+        fontWeight: '600',
     },
 });
 

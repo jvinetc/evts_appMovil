@@ -1,5 +1,5 @@
 import { useRouter } from 'expo-router';
-import React from 'react';
+import React, { useState } from 'react';
 import { StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 
@@ -13,6 +13,7 @@ interface LoginFormProps {
 
 const LoginForm: React.FC<LoginFormProps> = ({ email, setEmail, password, setPassword, handleSubmit }) => {
     const router = useRouter();
+    const [showPassword, setShowPassword] = useState(false);
     return (
         <View style={styles.container}>
             {/* Email */}
@@ -32,12 +33,19 @@ const LoginForm: React.FC<LoginFormProps> = ({ email, setEmail, password, setPas
                 <Icon name="lock-outline" size={24} color="#007B8A" />
                 <TextInput placeholder="Contraseña"
                     placeholderTextColor="#7f8c8d"
-                    secureTextEntry={true}
+                    secureTextEntry={!showPassword}
                     style={styles.input} value={password}
                     onChangeText={setPassword}
                     autoCapitalize='none' // Evita que se capitalicen las letras
                     autoCorrect={false} // Desactiva la autocorrección
                 />
+                <TouchableOpacity onPress={() => setShowPassword(prev => !prev)}>
+                    <Icon
+                        name={!showPassword ? 'eye-off-outline' : 'eye-outline'}
+                        size={24}
+                        color="#007B8A"
+                    />
+                </TouchableOpacity>
             </View>
 
             {/* Botón */}

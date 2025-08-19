@@ -1,7 +1,8 @@
 import { autocomplete } from '@/api/AddresApi';
+import { useToken } from '@/context/TokenContext';
 import { SellData } from '@/interface/Sell';
 import { StopData } from '@/interface/Stop';
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 
@@ -14,7 +15,7 @@ interface AutoCompleteProps {
     setSuggestions: React.Dispatch<React.SetStateAction<Suggestion[]>>;
     suggestions: Suggestion[];
     placeHolder: string;
-    isEdit:boolean;
+    isEdit: boolean;
 }
 type Suggestion = {
     placePrediction: {
@@ -25,18 +26,19 @@ type Suggestion = {
     };
 };
 const AutoComplete: React.FC<AutoCompleteProps> = ({ handleSelect, data, setData, blockAutocomplete, setBlockAutocomplete, setSuggestions, suggestions, placeHolder, isEdit }) => {
-
+    const [isEditingAddress, setIsEditingAddress] = useState(false);
+    const {token} = useToken();
     useEffect(() => {
         const fetchSuggestions = async () => {
             if (blockAutocomplete) {
                 setBlockAutocomplete(false);
                 return;
             }
-            if (data?.addres && data.addres.length < 3) return; // evita llamadas innecesarias
+            if (!isEditingAddress || !data?.addres || data.addres.length < 3) return; // evita llamadas innecesarias
 
             try {
                 if (data?.addres) {
-                    const { data: dt } = await autocomplete(data.addres);
+                    const { data: dt } = await autocomplete(data.addres, token);
                     const suggestions = dt.data.suggestions;
                     if (!suggestions) {
                         setSuggestions([]);
@@ -49,17 +51,20 @@ const AutoComplete: React.FC<AutoCompleteProps> = ({ handleSelect, data, setData
             }
         };
         fetchSuggestions();
-    }, [data?.addres]);
+    }, [data?.addres, isEditingAddress]);
 
     return (
         <View style={[styles.fieldContainer]}>
             <View style={styles.inputContainer}>
                 <Icon name="google-maps" size={24} color="#007B8A" />
                 <TextInput style={styles.input} value={data?.addres}
-                    onChangeText={(text) => setData({ ...data, addres: text })}
+                    onChangeText={(text) => {
+                        setIsEditingAddress(true);
+                        setData({ ...data, addres: text })
+                    }}
                     placeholder={placeHolder}
-                    placeholderTextColor="#7f8c8d" 
-                    editable={isEdit}/>
+                    placeholderTextColor="#7f8c8d"
+                    editable={isEdit} />
             </View>
             {suggestions.map((s) => (
                 <TouchableOpacity

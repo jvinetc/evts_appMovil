@@ -1,6 +1,10 @@
 import api from './axios';
 
-export const detailAddres = 
-(placeId: string) => api.get(`/autocomplete/detail/${placeId}`);
-export const autocomplete = (textInput: string) => 
-    api.post(`/autocomplete/${textInput}`);
+export const detailAddres =
+    (placeId: string, token: string) => api.get(`/autocomplete/detail/${placeId}`, {
+        headers: { Authorization: `Bearer ${token}` }
+    });
+export const autocomplete = (textInput: string, token: string) =>
+    api.post(`/autocomplete/${textInput}`, {
+        headers: { Authorization: `Bearer ${token}` }
+    });

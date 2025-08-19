@@ -10,7 +10,7 @@ export default function RootLayout() {
       <UserProvider>
         <TokenProvider>
           <View style={{ flex: 1 }}>
-            <Stack screenOptions={{ headerShown: false }} >
+            <Stack screenOptions={{ headerShown: false }}>
               <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
               <Stack.Screen name="screen/RegisterScreen" options={{ headerShown: false }} />
               <Stack.Screen name="screen/LoginScreen" options={{ headerShown: false }} />

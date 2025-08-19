@@ -6,11 +6,19 @@
     "orientation": "portrait",
     "icon": "./assets/images/favicon.png",
     "scheme": "appenvios",
-    "platforms": ["ios", "android", "web"],
+    "platforms": [
+      "ios",
+      "android",
+      "web"
+    ],
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.envios.AppEnvios",
+      "infoPlist": {
+        "ITSAppUsesNonExemptEncryption": false
+      }
     },
     "android": {
       "package": "com.envios.AppEnvios",
@@ -23,7 +31,7 @@
         "READ_MEDIA_DOCUMENTS"
       ],
       "adaptiveIcon": {
-        "foregroundImage": "./assets/images/adaptive-icon.png",
+        "foregroundImage": "./assets/images/favicon.png",
         "backgroundColor": "#ffffff"
       },
       "edgeToEdgeEnabled": true

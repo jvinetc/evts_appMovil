@@ -4,6 +4,7 @@ import { useState } from "react";
 import { login } from "@/api/User";
 import Header from "@/components/Header";
 import LoginForm from "@/components/LoginForm";
+import { useLoading } from "@/context/LoadingContext";
 import { useToken } from "@/context/TokenContext";
 import { useUserContext } from "@/context/UserContext";
 import { useRouter } from "expo-router";
@@ -17,6 +18,7 @@ export default function LoginScreen() {
     const { setUser } = useUserContext();
     const { setIsLoggedIn } = useUserContext();
     const { setToken } = useToken();
+    const {setLoading} = useLoading();
     const router = useRouter();
 
     const handleSubmit = async () => {
@@ -25,8 +27,14 @@ export default function LoginScreen() {
             return;
         }
         try {
+            setLoading(true);
             const userData: UserData = { email, password };
             const { data } = await login(userData);
+            if(data.user && data.user.role && data.user.role==='admin'){
+                Alert.alert('Error, su cuenta esta registrada como administrador, inicie sesion en la version web');
+                setError('Usuario registrao como administrador.');
+                return;
+            }
             setMessage('Login exitoso');
             setError('');
             setUser(data.user);
@@ -37,9 +45,9 @@ export default function LoginScreen() {
             setError("Error al iniciar sesion");
             Alert.alert('Error', 'No fue posible iniciar sesion, intentalo mas tarde, y si no las has hecho, verifica tu correo');
             console.log(error);
+        }finally{
+            setLoading(false);
         }
-
-
     };
 
     return (

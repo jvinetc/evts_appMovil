@@ -48,7 +48,7 @@ const FormAgendar = ({ user }: FormAgendarProps) => {
         const loadRates = async () => {
             setLoading(true);
             try {
-                const { data } = await listRates();
+                const { data } = await listRates(token);
                 setRates(data);
             } catch (error) {
                 console.log('Error al cargar tarifas:', error);
@@ -57,13 +57,12 @@ const FormAgendar = ({ user }: FormAgendarProps) => {
             }
         }
         loadRates();
-        console.log(user);
     }, []);
 
     const handleSelect = async (placeId: string, address: string) => {
         try {
-            const { data } = await detailAddres(placeId);
-            const { data: comunas } = await listComunas();
+            const { data } = await detailAddres(placeId, token);
+            const { data: comunas } = await listComunas(token);
             const { addres, streetName, streetNumber, comuna, lat, lng } = data.data;
             if (!addres || !streetName || !streetNumber || !comuna || !lat || !lng) {
                 setSuggestions([]);
