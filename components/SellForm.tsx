@@ -52,8 +52,8 @@ const SellForm = ({ user, setCreate, create, setUser }: sellFormProps) => {
 
     const handleSelect = async (placeId: string, address: string) => {
         try {
-            const { data } = await detailAddres(placeId);
-            const { data: comunas } = await listComunas();
+            const { data } = await detailAddres(placeId, token);
+            const { data: comunas } = await listComunas(token);
             const { addres, streetName, streetNumber, comuna, lat, lng } = data.data;
             if (!addres || !streetName || !streetNumber || !comuna || !lat || !lng) {
                 setSuggestions([]);

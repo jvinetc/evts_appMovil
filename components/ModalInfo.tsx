@@ -1,5 +1,6 @@
 import { listComunas } from '@/api/Comunas';
 import { useLoading } from '@/context/LoadingContext';
+import { useToken } from '@/context/TokenContext';
 import { IComuna } from '@/interface/Comuna';
 import React, { useEffect, useState } from 'react';
 import {
@@ -20,6 +21,7 @@ export const ModalInfo: React.FC<ModalProps> = ({ visible, setVisible }) => {
     const [filtradas, setFiltradas] = useState<IComuna[]>([]);
     const [comunas, setComunas] = useState<IComuna[]>([]);
     const {setLoading} = useLoading();
+    const {token} = useToken();
 
     const [busqueda, setBusqueda] = useState('');
 
@@ -36,7 +38,7 @@ export const ModalInfo: React.FC<ModalProps> = ({ visible, setVisible }) => {
     const loadComunas = async () => {
         try {
             setLoading(true);
-            const { data } = await listComunas();
+            const { data } = await listComunas(token);
             setComunas(data);
             setFiltradas(data);
         } catch (error) {
