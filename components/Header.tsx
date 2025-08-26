@@ -20,7 +20,7 @@ export default function Header({ title, isLoggedIn, user, current }: HeaderProps
         : isLoggedIn && user ? (
           <>
             <View style={styles.headerLeft}>
-              <Image source={user.Images && user.Images.length > 0 ? { uri: `${API_URL}/uploads/${user.Images[0].name}` } : {
+              <Image source={user.Images && user.Images.length > 0 ? { uri: user.Images[0].url } : {
                 uri: 'https://tse2.mm.bing.net/th/id/OIP.SPitBW3YurFj2aUt13oM0wHaEn?r=0&rs=1&pid=ImgDetMain&o=7&rm=3'
               }}
                 style={styles.avatar} />

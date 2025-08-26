@@ -117,7 +117,7 @@ const ProfileScreen = () => {
                 <Text style={styles.categoriaTexto}>Historial de Compras</Text>
                 <MaterialIcons name="keyboard-arrow-right" size={30} color="#888" style={styles.roundedIcon} />
             </TouchableOpacity>
-            <TouchableOpacity style={styles.categoria}>
+            {/* <TouchableOpacity style={styles.categoria}>
                 <Icon name="credit-card-outline" size={30} color="#007B8A" style={styles.roundedIcon} />
                 <Text style={styles.categoriaTexto}>Mis Tarjetas</Text>
                 <MaterialIcons name="keyboard-arrow-right" size={30} color="#888" style={styles.roundedIcon} />
@@ -126,7 +126,7 @@ const ProfileScreen = () => {
                 <MaterialIcons name="person-outline" size={30} color="#007B8A" style={styles.roundedIcon} />
                 <Text style={styles.categoriaTexto}>Mis Datos</Text>
                 <MaterialIcons name="keyboard-arrow-right" size={30} color="#888" style={styles.roundedIcon} />
-            </TouchableOpacity>
+            </TouchableOpacity> */}
 
 
             <View style={styles.resumenContainerP}>
