@@ -1,4 +1,5 @@
 import { StopData } from '@/interface/Stop';
+import { useRouter } from 'expo-router';
 import React from 'react';
 import { Modal, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
@@ -7,12 +8,12 @@ type PropsPedidos = {
     viewDetail: boolean;
     setViewDetail: (value: boolean) => void;
     title: string;
-
-
+    deleteStop: (value:StopData) => void;
 }
 
-const ModalPedidos: React.FC<PropsPedidos> = ({ stops, viewDetail, setViewDetail, title }) => {
-
+const ModalPedidos: React.FC<PropsPedidos> = ({ stops, viewDetail, setViewDetail, title, deleteStop }) => {
+    const router = useRouter();
+    
     return (
         <>
             <Modal visible={viewDetail} animationType="slide" transparent>
@@ -30,11 +31,29 @@ const ModalPedidos: React.FC<PropsPedidos> = ({ stops, viewDetail, setViewDetail
                                         <Text>Comuna: {stop.Comuna?.name}</Text>
                                         <Text>Fecha: {stop.createAt ? new Date(stop.createAt).toLocaleString() :
                                             new Date().toLocaleString()}</Text>
+                                        {stop.status === 'to_be_paid' &&
+                                            <View>
+                                                <TouchableOpacity onPress={() => router.navigate({
+                                                    pathname: '/(tabs)/screen/AgendarScreen',
+                                                    params: {
+                                                        stopId: stop.id,
+                                                    },
+                                                })}>
+                                                    <Text style={{ textDecorationLine: 'underline' }}>Editar</Text>
+                                                </TouchableOpacity>
+                                                <TouchableOpacity onPress={() => {
+                                                    deleteStop(stop);
+                                                    setViewDetail(false);
+
+                                                    }}>
+                                                    <Text style={{ textDecorationLine: 'underline' }}>Eliminar</Text>
+                                                </TouchableOpacity>
+                                            </View>}
                                     </View>
                                 ))}
                             </ScrollView>
                         </>}
-                        <TouchableOpacity onPress={() =>setViewDetail(false)} style={styles.closeButton}>
+                        <TouchableOpacity onPress={() => setViewDetail(false)} style={styles.closeButton}>
                             <Text style={styles.closeText}>Cerrar</Text>
                         </TouchableOpacity>
                     </View>

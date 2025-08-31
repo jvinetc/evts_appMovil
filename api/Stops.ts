@@ -18,7 +18,7 @@ export const listStopByUser = (data: UserData, token: string) => api.get(`/stop/
     headers: { Authorization: `Bearer ${token}` }
 });
 
-export const disableStop = (data: StopData, token: string) => api.put('/stop/disable', { id: data.id }, {
+export const disableStop = (data: StopData, token: string) => api.put('/stop/disable', data , {
     headers: { Authorization: `Bearer ${token}` }
 });
 export const updateStop = (data: StopData, token: string) => api.put('/stop', data, {
@@ -36,4 +36,8 @@ export const downloadTemplate = (token: string) => api.get(`/stop/downloadTempla
         Authorization: `Bearer ${token}`,
         Accept: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
     }
+});
+
+export const getStopById = (id?:number, token?:string) => api.get(`/stop/stop/${id}`, {
+    headers: { Authorization: `Bearer ${token}` }
 });

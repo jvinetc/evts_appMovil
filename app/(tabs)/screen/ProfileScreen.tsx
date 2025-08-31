@@ -1,4 +1,4 @@
-import { listStopByUser } from '@/api/Stops';
+import { disableStop, listStopByUser } from '@/api/Stops';
 import Header from '@/components/Header';
 import HistorialCompras from '@/components/HistorialCompras';
 import ModalPedidos from '@/components/ModalPedidos';
@@ -72,7 +72,21 @@ const ProfileScreen = () => {
             }
         }
         loadStops();
-    }, [user, isFocused])
+    }, [user, isFocused, !stops])
+
+    const deleteStop = async (stop:StopData) => {
+        setLoading(true);
+        try {
+            await disableStop(stop, token);
+            Alert.alert('Eliminado', 'Su punto fue eliminado.');
+            setStops(null);
+        } catch (error) {
+            console.log(error);
+        }finally{
+            setLoading(false);
+        }
+    }
+
 
     return (
         <View>
@@ -143,7 +157,7 @@ const ProfileScreen = () => {
                 <PayButton total={total} porPagar={porPagar} setPorPagar={setPorPagar} user={user} />
             </View>
             {viewHistory && <HistorialCompras setViewHistory={setViewHistory} viewHistory={viewHistory} user={user} />}
-            {viewDetail && <ModalPedidos setViewDetail={setViewDetail} stops={stopsModal} title={title} viewDetail={viewDetail} />}
+            {viewDetail && <ModalPedidos setViewDetail={setViewDetail} stops={stopsModal} title={title} viewDetail={viewDetail} deleteStop={deleteStop} />}
         </View>
     )
 }

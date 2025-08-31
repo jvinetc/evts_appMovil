@@ -158,8 +158,7 @@ const SellForm = ({ user, setCreate, create, setUser }: sellFormProps) => {
             <ImageModal visible={modalVisible}
                 onConfirm={(uri) => saveImage(uri)}
                 onCancel={() => setModalVisible(false)} />
-            <View style={styles.inputContainer}>
-                <Icon name="store-cog" size={24} color="#007B8A" />
+            <View style={styles.fieldContainer}>
                 <TextInput placeholder="Nombre de tu tienda"
                     placeholderTextColor="#7f8c8d"
                     value={sell?.name}
@@ -169,8 +168,7 @@ const SellForm = ({ user, setCreate, create, setUser }: sellFormProps) => {
                     editable={isEdit}
                 />
             </View>
-            <View style={styles.inputContainer}>
-                <Icon name="email-outline" size={24} color="#007B8A" />
+            <View style={styles.fieldContainer}>
                 <TextInput placeholder="Email"
                     placeholderTextColor="#7f8c8d"
                     value={sell?.email}
@@ -223,6 +221,15 @@ const styles = StyleSheet.create({
         paddingHorizontal: 20,
         gap: 12
     },
+    fieldContainer: {
+        marginBottom: 16,
+    },
+    input: {
+        backgroundColor: '#fff',
+        borderRadius: 12,
+        padding: 12,
+        fontSize: 16,
+    },
     inputContainer: {
         flexDirection: 'row',
         alignItems: 'center',
@@ -230,12 +237,12 @@ const styles = StyleSheet.create({
         borderColor: '#007B8A',
         marginBottom: 20,
     },
-    input: {
+    /* input: {
         flex: 1,
         marginLeft: 10,
         paddingVertical: 3,
         color: '#2c3e50'
-    },
+    }, */
     button: {
         backgroundColor: '#007B8A',
         paddingVertical: 12,

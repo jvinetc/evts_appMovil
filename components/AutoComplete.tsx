@@ -4,8 +4,6 @@ import { SellData } from '@/interface/Sell';
 import { StopData } from '@/interface/Stop';
 import React, { useEffect, useState } from 'react';
 import { StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
-import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-
 interface AutoCompleteProps {
     handleSelect: (placeId: string, address: string) => Promise<void>;
     data: StopData | SellData | undefined;
@@ -27,14 +25,17 @@ type Suggestion = {
 };
 const AutoComplete: React.FC<AutoCompleteProps> = ({ handleSelect, data, setData, blockAutocomplete, setBlockAutocomplete, setSuggestions, suggestions, placeHolder, isEdit }) => {
     const [isEditingAddress, setIsEditingAddress] = useState(false);
-    const {token} = useToken();
+    const { token } = useToken();
     useEffect(() => {
         const fetchSuggestions = async () => {
             if (blockAutocomplete) {
                 setBlockAutocomplete(false);
                 return;
             }
-            if (!isEditingAddress || !data?.addres || data.addres.length < 3) return; // evita llamadas innecesarias
+            if (!isEditingAddress || !data?.addres || data.addres.length < 3) {
+                 setSuggestions([]);
+                return; // evita llamadas innecesaria
+            }
 
             try {
                 if (data?.addres) {
@@ -55,8 +56,7 @@ const AutoComplete: React.FC<AutoCompleteProps> = ({ handleSelect, data, setData
 
     return (
         <View style={[styles.fieldContainer]}>
-            <View style={styles.inputContainer}>
-                <Icon name="google-maps" size={24} color="#007B8A" />
+            <View >
                 <TextInput style={styles.input} value={data?.addres}
                     onChangeText={(text) => {
                         setIsEditingAddress(true);
@@ -82,15 +82,13 @@ const styles = StyleSheet.create({
     inputContainer: {
         flexDirection: 'row',
         alignItems: 'center',
-        borderBottomWidth: 1,
-        borderColor: '#007B8A',
         marginBottom: 20,
     },
     input: {
-        flex: 1,
-        marginLeft: 10,
-        paddingVertical: 3,
-        color: '#2c3e50'
+        backgroundColor: '#fff',
+        borderRadius: 12,
+        padding: 12,
+        fontSize: 16,
     },
     container: {
         flex: 1,

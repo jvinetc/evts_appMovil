@@ -1,7 +1,7 @@
 import { detailAddres } from '@/api/AddresApi';
 import { listComunas } from '@/api/Comunas';
 import { listRates } from '@/api/Rate';
-import { createStop, uploadExcel } from '@/api/Stops';
+import { createStop, getStopById, updateStop, uploadExcel } from '@/api/Stops';
 import { useLoading } from '@/context/LoadingContext';
 import { useToken } from '@/context/TokenContext';
 import { IComuna } from '@/interface/Comuna';
@@ -9,10 +9,19 @@ import { IRate } from '@/interface/Rate';
 import { StopData } from '@/interface/Stop';
 import { UserData } from '@/interface/User';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
+import { useIsFocused } from '@react-navigation/native';
 import * as DocumentPicker from 'expo-document-picker';
-import { useRouter } from "expo-router";
+import { useLocalSearchParams, useRouter } from "expo-router";
 import React, { useEffect, useState } from 'react';
-import { Alert, Modal, StyleSheet, Switch, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import {
+    Alert,
+    KeyboardAvoidingView,
+    Modal,
+    Platform,
+    ScrollView,
+    StyleSheet, Switch, Text,
+    TextInput, TouchableOpacity, View
+} from 'react-native';
 import AutoComplete from './AutoComplete';
 import ButtonDownloadTemplate from './ButtonDownloadTemplate';
 import CustomDropDown from './CustomDropDown';
@@ -43,6 +52,8 @@ const FormAgendar = ({ user }: FormAgendarProps) => {
     const { setLoading } = useLoading();
     const phoneFormat = /^\+56\s?9\d{8}$|^569\d{8}$/i;
     const router = useRouter();
+    const { stopId } = useLocalSearchParams();
+    const isFocused = useIsFocused();
 
     useEffect(() => {
         const loadRates = async () => {
@@ -50,6 +61,7 @@ const FormAgendar = ({ user }: FormAgendarProps) => {
             try {
                 const { data } = await listRates(token);
                 setRates(data);
+                if (stopId) loadStopByEdit();
             } catch (error) {
                 console.log('Error al cargar tarifas:', error);
             } finally {
@@ -57,7 +69,19 @@ const FormAgendar = ({ user }: FormAgendarProps) => {
             }
         }
         loadRates();
-    }, []);
+    }, [isFocused]);
+
+    const loadStopByEdit = async () => {
+        setLoading(true);
+        try {
+            const { data } = await getStopById(Number(stopId), token);
+            setStop(data);
+        } catch (error) {
+            console.log(error);
+        } finally {
+            setLoading(false);
+        }
+    }
 
     const handleSelect = async (placeId: string, address: string) => {
         try {
@@ -103,13 +127,14 @@ const FormAgendar = ({ user }: FormAgendarProps) => {
 
         setLoading(true);
         try {
-            setStop({
+            const stopToSend = {
                 ...stop,
                 fragile: isFragile,
                 devolution: isReturnable,
-                sellId: user.Sells && user.Sells.length > 0 ? user.Sells[0].id : undefined
-            });
-            await createStop(stop, token);
+                sellId: user.Sells?.[0]?.id
+            };
+
+            await createStop(stopToSend, token);
             setStop({
                 addresName: '',
                 phone: '',
@@ -150,7 +175,7 @@ const FormAgendar = ({ user }: FormAgendarProps) => {
     const uploadExcelStop = async () => {
         try {
             setLoading(true);
-            if(user.Sells && user.Sells.length === 0){
+            if (user.Sells && user.Sells.length === 0) {
                 Alert.alert('Atencion', 'Para agendar primero debe crear una tienda.');
                 router.push('/(tabs)/screen/ConfigScreen');
                 return;
@@ -166,7 +191,7 @@ const FormAgendar = ({ user }: FormAgendarProps) => {
                 name: asset.name || asset.name || 'archivo.xlsx',
                 type: asset.mimeType || 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
             } as any);
-            let sellId =  user.Sells && user.Sells.length > 0 ? Number(user.Sells[0].id) : undefined;
+            let sellId = user.Sells && user.Sells.length > 0 ? Number(user.Sells[0].id) : undefined;
             const { data, status } = await uploadExcel(formData, token, sellId);
             if (status === 201) {
                 Alert.alert('Éxito', `${data.message}`);
@@ -186,39 +211,84 @@ const FormAgendar = ({ user }: FormAgendarProps) => {
         setStop({ ...stop, rateId: id });
     }
 
+    const handleUpdate = async () => {
+        if (!stop || !stop.addresName || !stop.phone || !stop.addres || !stop.rateId) {
+            Alert.alert('Error', 'Por favor completa todos los campos requeridos.');
+            console.log('No se ha completado el formulario');
+            return;
+        }
+        if (!stop.phone.match(phoneFormat)) {
+            Alert.alert('Error', 'El formato del teléfono es inválido.');
+            console.log('El formato del teléfono es inválido.');
+            return;
+        }
+        setLoading(true);
+        try {
+            const stopToSend = {
+                ...stop,
+                fragile: isFragile,
+                devolution: isReturnable,
+                sellId: user.Sells?.[0]?.id
+            };
+
+            await updateStop(stopToSend, token);
+            setStop({
+                addresName: '',
+                phone: '',
+                addres: '',
+                notes: '',
+                sellId: undefined,
+                comunaId: undefined,
+                rateId: undefined,
+            })
+            setIsFragile(false);
+            setIsReturnable(false);
+            Alert.alert('Éxito', 'Destinatario Actualizado correctamente');
+            router.push('/(tabs)/screen/ProfileScreen');
+        } catch (error) {
+            console.log('Error al guardar el destinatario:', error);
+            Alert.alert('Error', 'No se pudo guardar el destinatario. Inténtalo de nuevo más tarde.');
+        } finally {
+            setLoading(false);
+        }
+    }
 
     return (
         <View style={{ padding: 20 }}>
-            <View style={styles.fieldContainer}>
-                <TextInput style={styles.input} value={stop?.addresName}
-                    onChangeText={(text) => setStop({ ...stop, addresName: text })}
-                    placeholder='Nombre y Apellido...'
-                    placeholderTextColor="#7f8c8d" />
-            </View>
+            <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
+                <ScrollView keyboardShouldPersistTaps="handled">
+                    <View style={styles.fieldContainer}>
+                        <TextInput style={styles.input} value={stop?.addresName}
+                            onChangeText={(text) => setStop({ ...stop, addresName: text })}
+                            placeholder='Nombre y Apellido...'
+                            placeholderTextColor="#7f8c8d" />
+                    </View>
 
-            <View style={styles.fieldContainer}>
-                <TextInput style={styles.input} value={stop?.phone} keyboardType='phone-pad'
-                    onChangeText={(text) => setStop({ ...stop, phone: text })} placeholder='Telefono ej:(+56911111111)'
-                    placeholderTextColor="#7f8c8d" />
-            </View>
-            <AutoComplete
-                handleSelect={handleSelect}
-                data={stop}
-                setData={setStop}
-                blockAutocomplete={blockAutocomplete}
-                setBlockAutocomplete={setBlockAutocomplete}
-                setSuggestions={setSuggestions}
-                suggestions={suggestions}
-                placeHolder='Direccion de entrega'
-                isEdit={true}
-            />
+                    <View style={styles.fieldContainer}>
+                        <TextInput style={styles.input} value={stop?.phone} keyboardType='phone-pad'
+                            onChangeText={(text) => setStop({ ...stop, phone: text })} placeholder='Telefono ej:(+56911111111)'
+                            placeholderTextColor="#7f8c8d" />
+                    </View>
+                    <AutoComplete
+                        handleSelect={handleSelect}
+                        data={stop}
+                        setData={setStop}
+                        blockAutocomplete={blockAutocomplete}
+                        setBlockAutocomplete={setBlockAutocomplete}
+                        setSuggestions={setSuggestions}
+                        suggestions={suggestions}
+                        placeHolder='Direccion de entrega'
+                        isEdit={true}
+                    />
 
-            <View style={styles.fieldContainer}>
-                <TextInput style={styles.input} value={stop?.notes} multiline
-                    onChangeText={(text) => setStop({ ...stop, notes: text })}
-                    placeholder='Referencias(Depto/Torre/etc)'
-                    placeholderTextColor="#7f8c8d" />
-            </View>
+                    <View style={styles.fieldContainer}>
+                        <TextInput style={styles.input} value={stop?.notes} multiline
+                            onChangeText={(text) => setStop({ ...stop, notes: text })}
+                            placeholder='Referencias(Depto/Torre/etc)'
+                            placeholderTextColor="#7f8c8d" />
+                    </View>
+                </ScrollView>
+            </KeyboardAvoidingView>
             <View style={styles.fieldContainer}>
                 <CustomDropDown
                     rates={rates}
@@ -246,7 +316,7 @@ const FormAgendar = ({ user }: FormAgendarProps) => {
                     />
                 </View>
             </View>
-            <View style={styles.buttonRow}>
+            {!stopId && <View style={styles.buttonRow}>
                 {/* Descargar Excel */}
                 <ButtonDownloadTemplate />
 
@@ -255,11 +325,33 @@ const FormAgendar = ({ user }: FormAgendarProps) => {
                     <MaterialCommunityIcons name="upload" size={24} color="#3498DB" />
                     <Text style={styles.actionText}>Subir Excel</Text>
                 </TouchableOpacity>
-            </View>
+            </View>}
 
-            <TouchableOpacity style={[styles.tagButton, { backgroundColor: '#199b4fff' }]}>
-                <Text style={styles.tagText} onPress={() => handleSubmit()}>GRABAR DESTINATARIO</Text>
-            </TouchableOpacity>
+            {!stopId ?
+                <TouchableOpacity style={[styles.tagButton, { backgroundColor: '#199b4fff' }]}>
+                    <Text style={styles.tagText} onPress={() => handleSubmit()}>GRABAR DESTINATARIO</Text>
+                </TouchableOpacity>
+                :
+                <View style={styles.buttonRow}>
+                    <TouchableOpacity style={[styles.tagButton, { backgroundColor: '#199b4fff' }]}>
+                        <Text style={styles.tagText} onPress={() => handleUpdate()}>ACTUALIZAR DESTINATARIO</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity style={[styles.tagButton, { backgroundColor: '#9b6319ff' }]}>
+                        <Text style={styles.tagText} onPress={() => {
+                            setStop({
+                                addresName: '',
+                                phone: '',
+                                addres: '',
+                                notes: '',
+                                sellId: undefined,
+                                comunaId: undefined,
+                                rateId: undefined,
+                            });
+                            router.replace('/(tabs)/screen/AgendarScreen');
+                        }}>Cancelar</Text>
+                    </TouchableOpacity>
+                </View>
+            }
             <Modal visible={visible} animationType="slide" transparent>
                 <View style={styles.modalOverlay}>
                     <View style={styles.modalContainer}>

@@ -3,6 +3,7 @@ import { useRouter } from 'expo-router';
 import React from 'react';
 import { Dimensions, Image, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
+import NotificationBell from './NotificationBell';
 
 interface HeaderProps {
   title: string;
@@ -11,7 +12,7 @@ interface HeaderProps {
   current?: string; // Prop opcional para indicar si es la pantalla actual
 }
 export default function Header({ title, isLoggedIn, user, current }: HeaderProps) {
-  const API_URL = process.env.EXPO_PUBLIC_API_SERVER;
+  //const API_URL = process.env.EXPO_PUBLIC_API_SERVER;
   const router = useRouter();
   return (
     <View style={current === "Home" ? styles.header : styles.headerPerfil}>
@@ -24,11 +25,11 @@ export default function Header({ title, isLoggedIn, user, current }: HeaderProps
                 uri: 'https://tse2.mm.bing.net/th/id/OIP.SPitBW3YurFj2aUt13oM0wHaEn?r=0&rs=1&pid=ImgDetMain&o=7&rm=3'
               }}
                 style={styles.avatar} />
-              <View style={{ marginTop: 30, marginLeft: 20 }}>
+              <View style={{ marginTop: 25, marginLeft: 70 }}>
                 <Text style={styles.welcome}>{user.Sells && user.Sells.length === 0 ? 'Usuraio,' : 'Tienda,'} </Text>
                 <Text style={styles.subtitle}> {user.Sells && user.Sells.length > 0 ? user.Sells[0].name : user.username}</Text>
               </View>
-
+              <NotificationBell />
               <TouchableOpacity style={styles.perfilLink} onPress={() => router.navigate('/screen/ConfigScreen')}>
                 <Text style={styles.perfilText}>Mi Perfil</Text>
               </TouchableOpacity>

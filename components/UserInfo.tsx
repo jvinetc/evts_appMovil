@@ -1,7 +1,7 @@
 import { UserData } from '@/interface/User';
 import React, { useEffect, useState } from 'react';
 import { Alert, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
-import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
+import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import SellForm from './SellForm';
 
 type userInfoProps = {
@@ -31,144 +31,132 @@ const UserInfo = ({ user, setUser }: userInfoProps) => {
     }
 
     return (
-        <View style={styles.container}>
-            {!create && <>
-                <View style={styles.inputContainer}>
-                    <Icon name="account" size={24} color="#007B8A" />
-                    <TextInput placeholder="Nombre"
-                        placeholderTextColor="#7f8c8d"
-                        value={user?.firstName}
-                        onChangeText={(text) => setUser({ ...user, firstName: text })}
-                        autoCorrect={false} // Desactiva la autocorrección
-                        style={styles.input}
-                        editable={isEdit}
-                    />
-                </View>
-                <View style={styles.inputContainer}>
-                    <Icon name="account" size={24} color="#007B8A" />
-                    <TextInput placeholder="Apellidos"
-                        placeholderTextColor="#7f8c8d"
-                        value={user?.lastName}
-                        onChangeText={(text) => setUser({ ...user, lastName: text })}
-                        autoCorrect={false} // Desactiva la autocorrección
-                        style={styles.input}
-                        editable={isEdit}
-                    />
-                </View>
-                <View style={styles.inputContainer}>
-                    <Icon name="account" size={24} color="#007B8A" />
-                    <TextInput placeholder="Username"
-                        placeholderTextColor="#7f8c8d"
-                        value={user?.username}
-                        onChangeText={(text) => setUser({ ...user, username: text })}
-                        autoCorrect={false} // Desactiva la autocorrección
-                        style={styles.input}
-                        autoCapitalize='none'
-                        editable={isEdit}
-                    />
-                </View>
-                <View style={styles.inputContainer}>
-                    <Icon name="cellphone-basic" size={24} color="#007B8A" />
-                    <TextInput style={styles.input}
-                        value={user?.phone}
-                        keyboardType='phone-pad'
-                        onChangeText={(text) => setUser({ ...user, phone: text })}
-                        placeholder='Telefono ej:(+56911111111)'
-                        placeholderTextColor="#7f8c8d"
-                        editable={isEdit}
-                    />
-                </View>
-                <View style={styles.inputContainer}>
-                    <Icon name="email-outline" size={24} color="#007B8A" />
-                    <TextInput placeholder="Correo"
-                        placeholderTextColor="#7f8c8d"
-                        value={user?.email}
-                        onChangeText={(text) => setUser({ ...user, email: text })}
-                        autoCapitalize='none' // Evita que se capitalicen las letras
-                        autoCorrect={false} // Desactiva la autocorrección
-                        keyboardType="email-address"
-                        style={styles.input}
-                        editable={isEdit}
-                    />
-                </View>
-            </>}
-            {isEdit && <>
-                {/* Password */}
-                <View style={styles.inputContainer}>
-                    <Icon name="lock-outline" size={24} color="#007B8A" />
-                    <TextInput placeholder="Contraseña"
-                        placeholderTextColor="#7f8c8d"
-                        secureTextEntry={!showPassword}
-                        style={styles.input} value={user?.password}
-                        onChangeText={(text) => setUser({ ...user, password: text })}
-                        autoCapitalize='none' // Evita que se capitalicen las letras
-                        autoCorrect={false} // Desactiva la autocorrección
-                    />
-                    <TouchableOpacity onPress={() => setShowPassword(prev => !prev)}>
-                        <Icon
-                            name={!showPassword ? 'eye-off-outline' : 'eye-outline'}
-                            size={24}
-                            color="#007B8A"
+        <View style={{ padding: 20 }}>
+            <KeyboardAwareScrollView
+                contentContainerStyle={styles.container}
+                enableOnAndroid
+                extraScrollHeight={40}
+                keyboardShouldPersistTaps="handled"
+            >
+                {!create && <>
+                    <View style={styles.fieldContainer}>
+                        <TextInput placeholder="Nombre"
+                            placeholderTextColor="#7f8c8d"
+                            value={user?.firstName}
+                            onChangeText={(text) => setUser({ ...user, firstName: text })}
+                            autoCorrect={false} // Desactiva la autocorrección
+                            style={styles.input}
+                            editable={isEdit}
                         />
+                    </View>
+                    <View style={styles.fieldContainer}>
+                        <TextInput placeholder="Apellidos"
+                            placeholderTextColor="#7f8c8d"
+                            value={user?.lastName}
+                            onChangeText={(text) => setUser({ ...user, lastName: text })}
+                            autoCorrect={false} // Desactiva la autocorrección
+                            style={styles.input}
+                            editable={isEdit}
+                        />
+                    </View>
+                    <View style={styles.fieldContainer}>
+                        <TextInput placeholder="Username"
+                            placeholderTextColor="#7f8c8d"
+                            value={user?.username}
+                            onChangeText={(text) => setUser({ ...user, username: text })}
+                            autoCorrect={false} // Desactiva la autocorrección
+                            style={styles.input}
+                            autoCapitalize='none'
+                            editable={isEdit}
+                        />
+                    </View>
+                    <View style={styles.fieldContainer}>
+                        <TextInput style={styles.input}
+                            value={user?.phone}
+                            keyboardType='phone-pad'
+                            onChangeText={(text) => setUser({ ...user, phone: text })}
+                            placeholder='Telefono ej:(+56911111111)'
+                            placeholderTextColor="#7f8c8d"
+                            editable={isEdit}
+                        />
+                    </View>
+                    <View style={styles.fieldContainer}>
+                        <TextInput placeholder="Correo"
+                            placeholderTextColor="#7f8c8d"
+                            value={user?.email}
+                            onChangeText={(text) => setUser({ ...user, email: text })}
+                            autoCapitalize='none' // Evita que se capitalicen las letras
+                            autoCorrect={false} // Desactiva la autocorrección
+                            keyboardType="email-address"
+                            style={styles.input}
+                            editable={isEdit}
+                        />
+                    </View>
+                </>}
+                {isEdit && <>
+                    {/* Password */}
+                    <View style={styles.fieldContainer}>
+                        <TextInput placeholder="Contraseña"
+                            placeholderTextColor="#7f8c8d"
+                            secureTextEntry={isEdit}
+                            style={styles.input} value={user?.password}
+                            onChangeText={(text) => setUser({ ...user, password: text })}
+                            autoCapitalize='none' // Evita que se capitalicen las letras
+                            autoCorrect={false} // Desactiva la autocorrección
+                        />
+                    </View>
+                    <View style={styles.fieldContainer}>
+                        <TextInput placeholder="Confirmar contraseña"
+                            placeholderTextColor="#7f8c8d"
+                            secureTextEntry={isEdit}
+                            style={styles.input} value={passConfirm || ''}
+                            onChangeText={(text) => setPassConfirm(text)}
+                            autoCapitalize='none' // Evita que se capitalicen las letras
+                            autoCorrect={false} // Desactiva la autocorrección
+                            onBlur={comparePass}
+                        />
+                    </View>
+                </>}
+
+
+                {isEdit && <View style={styles.buttonRow}>
+                    <TouchableOpacity style={styles.actionButton} onPress={handleSubmit}>
+                        <Text style={styles.actionText}>Guardar</Text>
                     </TouchableOpacity>
-                </View>
-                <View style={styles.inputContainer}>
-                    <Icon name="lock-outline" size={24} color="#007B8A" />
-                    <TextInput placeholder="Confirmar contraseña"
-                        placeholderTextColor="#7f8c8d"
-                        secureTextEntry={!showPassword}
-                        style={styles.input} value={passConfirm || ''}
-                        onChangeText={(text) => setPassConfirm(text)}
-                        autoCapitalize='none' // Evita que se capitalicen las letras
-                        autoCorrect={false} // Desactiva la autocorrección
-                        onBlur={comparePass}
-                    />
-                </View>
-            </>}
+                    <TouchableOpacity style={styles.actionButton} onPress={() => setIsEdit(false)}>
+                        <Text style={styles.actionText}>Cancelar</Text>
+                    </TouchableOpacity>
+                </View>}
 
-            {isEdit && <View style={styles.buttonRow}>
-                <TouchableOpacity style={styles.actionButton} onPress={handleSubmit}>
-                    <Text style={styles.actionText}>Guardar</Text>
-                </TouchableOpacity>
-                <TouchableOpacity style={styles.actionButton} onPress={() => setIsEdit(false)}>
-                    <Text style={styles.actionText}>Cancelar</Text>
-                </TouchableOpacity>
-            </View>}
-
-            {/* Botón */}
-            {!isEdit && !create && <>
-                <View style={styles.buttonRow}>
-                    <TouchableOpacity style={styles.button} onPress={() => {
-                        setIsEdit(true);
-                        setUser({ ...user, password: '' });
+                {/* Botón */}
+                {!isEdit && !create && <>
+                    <View style={styles.buttonRow}>
+                        <TouchableOpacity style={styles.button} onPress={() => {
+                            setIsEdit(true);
+                            setUser({ ...user, password: '' });
                         }}>
-                        <Text style={styles.buttonText}>Editar</Text>
-                    </TouchableOpacity>
-                    {user?.Sells && user.Sells.length === 0 ?
-                        (<TouchableOpacity style={styles.button} onPress={() => setCreate(true)}>
-                            <Text style={styles.buttonText}>Crea tu tienda</Text>
-                        </TouchableOpacity>)
-                        :
-                        (<TouchableOpacity style={styles.button} onPress={() => setCreate(true)}>
-                            <Text style={styles.buttonText}>Ver tu tienda</Text>
-                        </TouchableOpacity>)}
-                </View>
-            </>}
-            {create &&
-                <SellForm user={user} setCreate={setCreate} create={create} setUser={setUser} />
-            }
+                            <Text style={styles.buttonText}>Editar</Text>
+                        </TouchableOpacity>
+                        {user?.Sells && user.Sells.length === 0 ?
+                            (<TouchableOpacity style={styles.button} onPress={() => setCreate(true)}>
+                                <Text style={styles.buttonText}>Crea tu tienda</Text>
+                            </TouchableOpacity>)
+                            :
+                            (<TouchableOpacity style={styles.button} onPress={() => setCreate(true)}>
+                                <Text style={styles.buttonText}>Ver tu tienda</Text>
+                            </TouchableOpacity>)}
+                    </View>
+                </>}
+                {create &&
+                    <SellForm user={user} setCreate={setCreate} create={create} setUser={setUser} />
+                }
+            </KeyboardAwareScrollView>
         </View>
     )
 }
 const styles = StyleSheet.create({
     container: {
-        flex: 1,
-        backgroundColor: '#fff',
-        alignItems: 'center',
-        paddingHorizontal: 20,
-        width: '100%',
-        padding: '8%',
-        gap: 12
+        paddingBottom: 120,
     },
     inputContainer: {
         flexDirection: 'row',
@@ -177,11 +165,14 @@ const styles = StyleSheet.create({
         borderColor: '#007B8A',
         marginBottom: 20,
     },
+    fieldContainer: {
+        marginBottom: 16,
+    },
     input: {
-        flex: 1,
-        marginLeft: 10,
-        paddingVertical: 3,
-        color: '#2c3e50'
+        backgroundColor: '#fff',
+        borderRadius: 12,
+        padding: 12,
+        fontSize: 16,
     },
     button: {
         backgroundColor: '#007B8A',
