@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "852675740208",
+    "project_id": "app-envios-ts",
+    "storage_bucket": "app-envios-ts.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:852675740208:android:68bc2b411b3cfde9cca3f5",
+        "android_client_info": {
+          "package_name": "com.envios.AppEnvios"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC6LRKC1g-IbvF3xD6boNq3K3jN70d2jF4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

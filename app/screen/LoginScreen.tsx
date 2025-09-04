@@ -7,6 +7,7 @@ import LoginForm from "@/components/LoginForm";
 import { useLoading } from "@/context/LoadingContext";
 import { useToken } from "@/context/TokenContext";
 import { useUserContext } from "@/context/UserContext";
+import { registerPushToken } from "@/utils/Notifications";
 import { useRouter } from "expo-router";
 import { Alert, StyleSheet, Text } from 'react-native';
 
@@ -38,6 +39,7 @@ export default function LoginScreen() {
             setMessage('Login exitoso');
             setError('');
             setUser(data.user);
+            await registerPushToken(data.user.id);            
             setToken(data.token); // Guardar el token en el contexto
             setIsLoggedIn(true);    
             router.push('/(tabs)/screen/HomeScreen'); // Redirige a la pantalla de inicio

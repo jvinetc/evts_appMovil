@@ -32,16 +32,14 @@ const PayButton = ({ total, porPagar, setPorPagar, user }: payProps) => {
         }
         try {
             setLoading(true);
-            const sessionId = `SID-${Date.now()}-${user && user.Sells !== undefined && user.Sells[0].id}`;
+            const sessionId = `SID-${Date.now()}-${user && user.Sells !== undefined && user.Sells !== null && user?.Sells[0].id}`;
             const returnUrl = `${API_URL}/webpay-return`;
             const { data } = await pay(porPagar, total, sessionId, returnUrl, token);
             const { token: payToken, url } = data;
             const fullUrl = `${url}?token_ws=${payToken}`;
             const redirectUrl = 'appenvios://(tabs)/screen/ProfileScreen';
             const result = await WebBrowser.openAuthSessionAsync(fullUrl, redirectUrl);
-            console.log('result:', result);
             if (result.type === 'success' && result.url.includes('token_ws')) {
-                console.log('result.url:', result.url);
                 const token_ws = new URL(result.url).searchParams.get('token_ws');
                 const { data, status } = await verifyPay(token_ws, token);
                 if (status === 200) {

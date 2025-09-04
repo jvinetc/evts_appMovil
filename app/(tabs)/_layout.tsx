@@ -58,6 +58,13 @@ export default function TabLayout() {
                         tabBarIcon: ({ color, size }) =>
                             (<Ionicons name="calendar" color={color} size={size} />)
                     }} />
+                <Tabs.Screen name="screen/Notifications"
+                    options={{
+                        title: "Notificacion",
+                        headerShown: false,
+                        tabBarIcon: ({ color, size }) =>
+                            (<Ionicons name="notifications" color={color} size={size} />)
+                    }} />
                 <Tabs.Screen name="screen/ConfigScreen"
                     options={{
                         title: "Configuración",

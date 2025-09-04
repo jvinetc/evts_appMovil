@@ -3,6 +3,7 @@ import { useToken } from '@/context/TokenContext';
 import { useUserContext } from '@/context/UserContext';
 import { INotification } from '@/interface/Notification';
 import { Ionicons } from '@expo/vector-icons';
+import { router } from 'expo-router';
 import React, { useEffect, useRef, useState } from 'react';
 import { Animated, FlatList, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { io } from 'socket.io-client';
@@ -28,12 +29,7 @@ const NotificationBell = () => {
                 console.log(error);
             }
         }
-
-        Animated.timing(fadeAnim, {
-            toValue: open ? 1 : 0,
-            duration: 200,
-            useNativeDriver: true,
-        }).start();
+        loadNotifications();
         socket.on('client', (data) => {
             console.log(data);
             loadNotifications();
@@ -41,8 +37,16 @@ const NotificationBell = () => {
         return () => {
             socket.off('admin');
         };
-    }, [open]);
+    }, []);
 
+    useEffect(() => {
+
+        Animated.timing(fadeAnim, {
+            toValue: open ? 1 : 0,
+            duration: 200,
+            useNativeDriver: true,
+        }).start();
+    }, [open]);
 
     return (
         <View>
@@ -63,18 +67,28 @@ const NotificationBell = () => {
                         data={notifications}
                         keyExtractor={(item) => String(item.id)}
                         renderItem={({ item }) => (
-                            <TouchableOpacity
-                                style={styles.item}
-                                onPress={() => {
-                                    setOpen(false);
-                                    // Aquí puedes navegar a la pantalla de perfil o detalle
-                                    // Ejemplo: router.navigate('/screen/ProfileScreen');
-                                }}
-                            >
-                                <Text style={styles.itemTitle}>{item.title}</Text>
-                                <Text style={styles.itemMessage}>{item.message}</Text>
-                            </TouchableOpacity>
+                            <>
+                                <TouchableOpacity
+                                    style={styles.item}
+                                    onPress={() => {
+                                        setOpen(false);
+                                        // Aquí puedes navegar a la pantalla de perfil o detalle
+                                        // Ejemplo: router.navigate('/screen/ProfileScreen');
+                                    }}
+                                >
+                                    <Text style={styles.itemTitle}>{item.title}</Text>
+                                    <Text style={styles.itemMessage}>{item.message}</Text>
+                                </TouchableOpacity>
+                            </>
                         )}
+                        ListFooterComponent={
+                            <TouchableOpacity
+                                onPress={() => router.navigate('/screen/Notifications')}
+                                style={styles.footerButton}
+                            >
+                                <Text style={styles.footerButtonText}>Ver todas las notificaciones</Text>
+                            </TouchableOpacity>
+                        }
                     />
                 </Animated.View>
             )}
@@ -132,6 +146,18 @@ const styles = StyleSheet.create({
     itemMessage: {
         fontSize: 12,
         color: '#555',
+    },
+    footerButton: {
+        marginTop: 16,
+        backgroundColor: '#007aff',
+        paddingVertical: 10,
+        borderRadius: 8,
+        alignItems: 'center',
+    },
+    footerButtonText: {
+        color: '#fff',
+        fontSize: 15,
+        fontWeight: '600',
     },
 });
 export default NotificationBell;
