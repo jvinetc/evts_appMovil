@@ -54,9 +54,9 @@ const LoginForm: React.FC<LoginFormProps> = ({ email, setEmail, password, setPas
             </TouchableOpacity>
 
             {/* Link simple */}
-            <TouchableOpacity onPress={() => console.log('olvidaste la contasenia')}>
+            {/* <TouchableOpacity onPress={() => console.log('olvidaste la contasenia')}>
                 <Text style={styles.link}>¿Olvidaste tu contraseña?</Text>
-            </TouchableOpacity>
+            </TouchableOpacity> */}
             {/* Link resaltado */}
             <TouchableOpacity onPress={() => router.push('/screen/RegisterScreen')}>
                 <Text style={styles.linkResaltado}>¿No tienes cuenta? Regístrate</Text>

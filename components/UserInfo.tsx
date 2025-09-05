@@ -1,6 +1,10 @@
+import { update } from '@/api/User';
+import { useLoading } from '@/context/LoadingContext';
+import { useToken } from '@/context/TokenContext';
 import { UserData } from '@/interface/User';
+import DateTimePicker from '@react-native-community/datetimepicker';
 import React, { useEffect, useState } from 'react';
-import { Alert, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { Alert, Platform, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import SellForm from './SellForm';
 
@@ -13,10 +17,16 @@ const UserInfo = ({ user, setUser }: userInfoProps) => {
     const [isEdit, setIsEdit] = useState(false);
     const [passConfirm, setPassConfirm] = useState('');
     const [create, setCreate] = useState(false);
+    const [date, setDate] = useState<Date | null>(null);
+    const [showPicker, setShowPicker] = useState(false);
+    const { setLoading } = useLoading();
+    const { token } = useToken();
     const [showPassword, setShowPassword] = useState(false);
+
     useEffect(() => {
         if (create) setCreate(false);
-    }, []);
+        setDate(user && user.birthDate ? new Date(user.birthDate) : null)
+    }, [user]);
 
     const comparePass = () => {
         if (user && user.password !== passConfirm) {
@@ -26,8 +36,54 @@ const UserInfo = ({ user, setUser }: userInfoProps) => {
         }
     }
 
+    const calculateAge = (birthDate: Date): number => {
+        const today = new Date();
+        let age = today.getFullYear() - birthDate.getFullYear();
+        const m = today.getMonth() - birthDate.getMonth();
+        if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) {
+            age--;
+        }
+        return age;
+    };
+
+    const handleDateChange = async (_event: any, selectedDate?: Date) => {
+        setShowPicker(false);
+        if (selectedDate) {
+            setDate(selectedDate);
+            const ageLocal = Number(calculateAge(selectedDate));
+            if (ageLocal < 18) {
+                Alert.alert('Error', 'Para registrarse debe tener mayoria de edad.')
+                setDate(null);
+                return;
+            }
+            const formattedDate = selectedDate.toISOString().split('T')[0];
+            setUser({ ...user, age: ageLocal, birthDate: formattedDate });
+        }
+    }
+
     const handleSubmit = async () => {
-        console.log(user)
+        if (!user || !user.firstName ||
+            !user.lastName || !user.email ||
+            !user.username || !date || !user.phone) {
+            Alert.alert('Error', 'Los campos deben estar completos');
+            return;
+        }
+        try {
+            setLoading(true);
+            const { data, status } = await update(user, token);
+            if (status === 200) {
+                Alert.alert('Felicidades', 'Usuario actualizado correctamente');
+            }
+            setDate(null);
+            setPassConfirm('');
+            setIsEdit(false);
+            setUser({...user, ...data})
+        } catch (error) {
+            console.log(error);
+            Alert.alert('Error', 'No se pudo actualizar, intentelo mas tarde')
+        } finally {
+            setLoading(false);
+        }
     }
 
     return (
@@ -92,13 +148,29 @@ const UserInfo = ({ user, setUser }: userInfoProps) => {
                             editable={isEdit}
                         />
                     </View>
+                    <View style={styles.fieldContainer}>
+                        <TouchableOpacity onPress={() => isEdit && setShowPicker(true)} style={styles.input}>
+                            <Text style={date ? { color: '#2c3e50' } : { color: '#7f8c8d' }}>
+                                {date ? date.toLocaleDateString() : 'Selecciona tu fecha de nacimiento'}
+                            </Text>
+                        </TouchableOpacity>
+                        {showPicker && (
+                            <DateTimePicker
+                                value={date || new Date(2000, 0, 1)}
+                                mode="date"
+                                display={Platform.OS === 'ios' ? 'spinner' : 'default'}
+                                maximumDate={new Date()}
+                                onChange={handleDateChange}
+                            />
+                        )}
+                    </View>
                 </>}
                 {isEdit && <>
                     {/* Password */}
                     <View style={styles.fieldContainer}>
                         <TextInput placeholder="Contraseña"
                             placeholderTextColor="#7f8c8d"
-                            secureTextEntry={isEdit}
+                            secureTextEntry={true}
                             style={styles.input} value={user?.password}
                             onChangeText={(text) => setUser({ ...user, password: text })}
                             autoCapitalize='none' // Evita que se capitalicen las letras
@@ -108,7 +180,7 @@ const UserInfo = ({ user, setUser }: userInfoProps) => {
                     <View style={styles.fieldContainer}>
                         <TextInput placeholder="Confirmar contraseña"
                             placeholderTextColor="#7f8c8d"
-                            secureTextEntry={isEdit}
+                            secureTextEntry={true}
                             style={styles.input} value={passConfirm || ''}
                             onChangeText={(text) => setPassConfirm(text)}
                             autoCapitalize='none' // Evita que se capitalicen las letras
@@ -173,6 +245,7 @@ const styles = StyleSheet.create({
         borderRadius: 12,
         padding: 12,
         fontSize: 16,
+        color: '#2c3e50'
     },
     button: {
         backgroundColor: '#007B8A',
@@ -190,14 +263,13 @@ const styles = StyleSheet.create({
     buttonRow: {
         flexDirection: 'row',
         justifyContent: 'space-around',
-        marginVertical: 16,
         width: '100%'
     },
     actionButton: {
         flexDirection: 'row',
         alignItems: 'center',
         backgroundColor: '#fff',
-        paddingVertical: 10,
+        paddingVertical: 2,
         paddingHorizontal: 15,
         borderRadius: 12,
         elevation: 2,

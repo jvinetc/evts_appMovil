@@ -19,7 +19,7 @@ export default function LoginScreen() {
     const { setUser } = useUserContext();
     const { setIsLoggedIn } = useUserContext();
     const { setToken } = useToken();
-    const {setLoading} = useLoading();
+    const { setLoading } = useLoading();
     const router = useRouter();
 
     const handleSubmit = async () => {
@@ -27,11 +27,13 @@ export default function LoginScreen() {
             setError('Los campos son obligatorios');
             return;
         }
+        setMessage('');
+        setError('');
         try {
             setLoading(true);
             const userData: UserData = { email, password };
             const { data } = await login(userData);
-            if(data.user && data.user.role && data.user.role==='admin'){
+            if (data.user && data.user.role && data.user.role === 'admin') {
                 Alert.alert('Error, su cuenta esta registrada como administrador, inicie sesion en la version web');
                 setError('Usuario registrao como administrador.');
                 return;
@@ -39,16 +41,17 @@ export default function LoginScreen() {
             setMessage('Login exitoso');
             setError('');
             setUser(data.user);
-            await registerPushToken(data.user.id);            
+            await registerPushToken(data.user.id);
             setToken(data.token); // Guardar el token en el contexto
-            setIsLoggedIn(true);    
+            setIsLoggedIn(true);
             router.push('/(tabs)/screen/HomeScreen'); // Redirige a la pantalla de inicio
         } catch (error) {
             setError("Error al iniciar sesion");
             Alert.alert('Error', 'No fue posible iniciar sesion, intentalo mas tarde, y si no las has hecho, verifica tu correo');
             console.log(error);
-        }finally{
+        } finally {
             setLoading(false);
+
         }
     };
 
@@ -62,7 +65,7 @@ export default function LoginScreen() {
                 setPassword={setPassword}
                 handleSubmit={handleSubmit}
             />
-            
+
             {error ? <Text style={styles.error}>{error}</Text> : null}
             {message ? <Text style={styles.success}>{message}</Text> : null}
         </>

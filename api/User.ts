@@ -12,6 +12,6 @@ export const disable = (data: UserData, token:string) =>
     headers: { Authorization: `Bearer ${token}` }
 }    );
 export const update = (data: UserData, token: string) =>
-    api.put('/', data, {
+    api.put<UserData>('/user', data, {
         headers: { Authorization: `Bearer ${token}` }
     })
