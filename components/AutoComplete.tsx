@@ -33,7 +33,7 @@ const AutoComplete: React.FC<AutoCompleteProps> = ({ handleSelect, data, setData
                 return;
             }
             if (!isEditingAddress || !data?.addres || data.addres.length < 3) {
-                 setSuggestions([]);
+                setSuggestions([]);
                 return; // evita llamadas innecesaria
             }
 
@@ -64,7 +64,10 @@ const AutoComplete: React.FC<AutoCompleteProps> = ({ handleSelect, data, setData
                     }}
                     placeholder={placeHolder}
                     placeholderTextColor="#7f8c8d"
-                    editable={isEdit} />
+                    editable={isEdit}
+                    autoCapitalize='none' // Evita que se capitalicen las letras
+                    autoCorrect={false} // Desactiva la autocorrección
+                />
             </View>
             {suggestions.map((s) => (
                 <TouchableOpacity
