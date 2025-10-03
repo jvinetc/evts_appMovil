@@ -1,5 +1,5 @@
 import { UserData } from "@/interface/User";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 //import { Button, StyleSheet, Text, TextInput, View } from 'react-native';
 import { login } from "@/api/User";
 import Header from "@/components/Header";
@@ -10,6 +10,7 @@ import { useUserContext } from "@/context/UserContext";
 import { registerPushToken } from "@/utils/Notifications";
 import { useRouter } from "expo-router";
 import { Alert, StyleSheet, Text } from 'react-native';
+import PageLoad from "@/components/PageLoad";
 
 export default function LoginScreen() {
     const [email, setEmail] = useState('');
@@ -19,8 +20,13 @@ export default function LoginScreen() {
     const { setUser } = useUserContext();
     const { setIsLoggedIn } = useUserContext();
     const { setToken } = useToken();
-    const { setLoading } = useLoading();
+    const { isLoading, setLoading } = useLoading();
     const router = useRouter();
+
+    useEffect(()=>{
+        setMessage('');
+        setError('');
+    },[]);
 
     const handleSubmit = async () => {
         if (!email.trim() && !password.trim()) {
@@ -46,17 +52,18 @@ export default function LoginScreen() {
             setIsLoggedIn(true);
             router.push('/(tabs)/screen/HomeScreen'); // Redirige a la pantalla de inicio
         } catch (error) {
+            setMessage('');
             setError("Error al iniciar sesion");
             Alert.alert('Error', 'No fue posible iniciar sesion, intentalo mas tarde, y si no las has hecho, verifica tu correo');
             console.log(error);
         } finally {
             setLoading(false);
-
         }
     };
 
     return (
         <>
+            {isLoading && <PageLoad />}
             <Header title="Login" isLoggedIn={false} user={null} />
             <LoginForm
                 email={email}

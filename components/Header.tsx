@@ -37,14 +37,14 @@ export default function Header({ title, isLoggedIn, user, current }: HeaderProps
 
             {current === 'Profile' ? (
               <>
-                <View style={styles.searchContainer}>
+                {/* <View style={styles.searchContainer}>
                   <Icon name="shopping-search" size={20} color="#888" />
                   <TextInput
                     style={styles.searchInput}
                     placeholder="Buscar mi pedido"
                     placeholderTextColor="#888"
                   />
-                </View>
+                </View> */}
               </>
             ) : (
               <Text style={styles.headerText}>{title}</Text>

@@ -7,6 +7,8 @@ import { router } from 'expo-router';
 import React, { useEffect, useRef, useState } from 'react';
 import { Animated, FlatList, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { io } from 'socket.io-client';
+import * as Notifications from 'expo-notifications';
+import { useSocket } from '@/context/SocketContext';
 
 
 const NotificationBell = () => {
@@ -15,20 +17,9 @@ const NotificationBell = () => {
     const [notifications, setNotifications] = useState<INotification[]>([]);
     const { user } = useUserContext();
     const { token } = useToken();
-    const API_URL = process.env.EXPO_PUBLIC_API_SERVER;
-    const socket = io(API_URL);
+    const socket = useSocket();
     useEffect(() => {
-        const loadNotifications = async () => {
-            try {
-                if (!user || !user.Sells) {
-                    return;
-                }
-                const { data } = await getNotRead({ sellId: user.Sells[0].id ?? 0, token })
-                setNotifications(data);
-            } catch (error) {
-                console.log(error);
-            }
-        }
+        if (!socket) return;
         loadNotifications();
         socket.on('client', (data) => {
             console.log(data);
@@ -38,6 +29,17 @@ const NotificationBell = () => {
             socket.off('admin');
         };
     }, []);
+    const loadNotifications = async () => {
+        try {
+            if (!user || !user.Sells) {
+                return;
+            }
+            const { data } = await getNotRead({ sellId: user.Sells[0].id ?? 0, token })
+            setNotifications(data);
+        } catch (error) {
+            console.log(error);
+        }
+    }
 
     useEffect(() => {
 
@@ -47,6 +49,30 @@ const NotificationBell = () => {
             useNativeDriver: true,
         }).start();
     }, [open]);
+
+    useEffect(() => {
+
+        // Listener cuando se recibe una notificación en primer plano
+        const subscription = Notifications.addNotificationReceivedListener(notification => {
+            console.log('📩 Notificación recibida:', notification);
+            loadNotifications();
+            // Aquí puedes actualizar el estado, mostrar un modal, etc.
+        });
+
+        // Listener cuando el usuario toca la notificación
+        const responseSubscription = Notifications.addNotificationResponseReceivedListener(response => {
+            console.log('👆 Notificación tocada:', response);
+            router.navigate('/screen/Notifications')
+            // Puedes navegar a una pantalla específica, por ejemplo
+        })
+
+        return () => {
+            subscription.remove();
+            responseSubscription.remove();
+        };
+    }, []);
+
+
 
     return (
         <View>

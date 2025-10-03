@@ -23,5 +23,8 @@ export interface StopData {
     Comuna?: IComuna;
     Rate?: IRate;
     Sell?: SellData;
-
+    evidence?: string[],
+    exchange?: boolean;
+    pickupDate?: string;
+    deliveryDate?: string;
 }

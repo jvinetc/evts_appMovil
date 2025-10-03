@@ -2,6 +2,7 @@ import { disableStop, listStopByUser } from '@/api/Stops';
 import Header from '@/components/Header';
 import HistorialCompras from '@/components/HistorialCompras';
 import ModalPedidos from '@/components/ModalPedidos';
+import PageLoad from '@/components/PageLoad';
 import PayButton from '@/components/PayButton';
 import { useLoading } from '@/context/LoadingContext';
 import { useToken } from '@/context/TokenContext';

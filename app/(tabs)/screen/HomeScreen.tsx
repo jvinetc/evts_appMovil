@@ -14,7 +14,7 @@ export default function HomeScreen({ navigation }: HomeScreenProps) {
   const instagramUrl = process.env.EXPO_PUBLIC_INSTAGRAM_URL || 'https://instagram.com/tu_cuenta';
   const iconScale = useRef(new Animated.Value(1)).current;
   const [visible, setVisible] = useState(false);
-  const {isLoggedIn, user} = useUserContext();
+  const { isLoggedIn, user } = useUserContext();
 
   const handlePressWsp = () => {
     Animated.sequence([

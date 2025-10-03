@@ -16,7 +16,8 @@
         "buildType": "apk"
       },
       "ios": {
-        "simulator": false
+        "simulator": false,
+        "credentialsSource": "remote"
       }
     },
     "client-review": {
@@ -25,7 +26,8 @@
         "buildType": "apk"
       },
       "ios": {
-        "simulator": false
+        "simulator": false,
+        "credentialsSource": "remote"
       },
       "env": {
         "EXPO_PUBLIC_API_SERVER": "https://evts-backend.onrender.com",
@@ -38,7 +40,8 @@
         "buildType": "app-bundle"
       },
       "ios": {
-        "simulator": false
+        "simulator": false,
+        "credentialsSource": "remote"
       }
     }
   }

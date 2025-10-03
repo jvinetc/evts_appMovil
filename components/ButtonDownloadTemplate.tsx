@@ -49,18 +49,18 @@ const ButtonDownloadTemplate = () => {
                         'Permiso denegado',
                         'No se puede abrir el archivo sin acceso al almacenamiento.'
                     );
-                    Linking.openURL(`https://wa.me/${whatsappNumber}?text=Hola, comparteme la plantilla para solicitar envios`);
+                    Linking.openURL(`https://wa.me/${whatsappNumber}?text=Hola, me compartes la plantilla para agendar envios`);
                     return;
                 }
             }
-
-            // 📥 Ruta donde se guardará el archivo
-            const fileUri = FileSystem.documentDirectory + 'Plantilla_Stops.xlsx';
+            const fileName = 'Plantilla_Stops.xlsx';
+            const tempUri = FileSystem.cacheDirectory + fileName;
+            const targetUri = FileSystem.documentDirectory + fileName;
 
             // 🚀 Descargar el archivo
             const download = FileSystem.createDownloadResumable(
                 `${API_URL}/stop/downloadTemplate`,
-                fileUri,
+                tempUri,
                 {
                     headers: {
                         Authorization: `Bearer ${token}`,
@@ -68,18 +68,45 @@ const ButtonDownloadTemplate = () => {
                 }
             );
 
-            const result = await download.downloadAsync();
+            let result;
+            try {
+                result = await download.downloadAsync();
+            } catch (err) {
+                console.error('❌ Error en downloadAsync:', err);
+                throw err;
+            }
 
             if (!result || !('uri' in result)) {
                 throw new Error('No se pudo obtener la URI del archivo descargado.');
             }
-
-            console.log('Plantilla descargada en:', result.uri);
-            Alert.alert('Descarga completa', 'La plantilla se guardó en tu dispositivo.');
+            try {
+                await FileSystem.copyAsync({
+                    from: result.uri,
+                    to: targetUri,
+                });
+                console.log('Plantilla descargada en:', result.uri);
+                Alert.alert('Descarga completa', 'La plantilla se guardó en tu dispositivo.');
+            } catch (error) {
+                throw error;
+            }
 
             // 📂 Abrir el archivo según plataforma
             if (Platform.OS === 'android') {
                 try {
+                    const fileInfo = await FileSystem.getInfoAsync(result.uri);
+                    if (!fileInfo.exists) {
+                        throw new Error('El archivo no existe en la ruta especificada.');
+                    }
+                    const info = await FileSystem.getInfoAsync(targetUri);
+                    if (!info.exists) throw new Error('Archivo no copiado correctamente');
+                    const asset = await MediaLibrary.createAssetAsync(result.uri);
+                    console.log(asset)
+                    let album = await MediaLibrary.getAlbumAsync('Download');
+                    if (!album) {
+                        album = await MediaLibrary.createAlbumAsync('Download', asset, false);
+                    } else {
+                        await MediaLibrary.addAssetsToAlbumAsync([asset], album, false);
+                    }
                     await IntentLauncher.startActivityAsync('android.intent.action.VIEW', {
                         data: result.uri,
                         flags: 1,
@@ -88,10 +115,17 @@ const ButtonDownloadTemplate = () => {
                     await saveToDownloads(result.uri);
                 } catch (error) {
                     console.warn('No se pudo abrir el archivo:', error);
-                    Alert.alert(
-                        'No se pudo abrir el archivo',
-                        'Asegúrate de tener una app como Excel o Google Sheets instalada.'
-                    );
+                    if (await Sharing.isAvailableAsync()) {
+                        await Sharing.shareAsync(result.uri, {
+                            mimeType: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+                            dialogTitle: 'Abrir plantilla Excel',
+                        });
+                    } else {
+                        Alert.alert(
+                            'No se pudo abrir el archivo',
+                            'Asegúrate de tener una app como Excel o Google Sheets instalada.'
+                        );
+                    }
                 }
             } else {
                 if (await Sharing.isAvailableAsync()) {

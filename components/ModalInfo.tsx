@@ -1,7 +1,9 @@
 import { listComunas } from '@/api/Comunas';
+import { listRates } from '@/api/Rate';
 import { useLoading } from '@/context/LoadingContext';
 import { useToken } from '@/context/TokenContext';
 import { IComuna } from '@/interface/Comuna';
+import { IRate } from '@/interface/Rate';
 import React, { useEffect, useState } from 'react';
 import {
     FlatList,
@@ -18,10 +20,11 @@ interface ModalProps {
     setVisible: (value: boolean) => void;
 }
 export const ModalInfo: React.FC<ModalProps> = ({ visible, setVisible }) => {
-    const [filtradas, setFiltradas] = useState<IComuna[]>([]);
+    const [filtradas, setFiltradas] = useState<IRate[]>([]);
     const [comunas, setComunas] = useState<IComuna[]>([]);
-    const {setLoading} = useLoading();
-    const {token} = useToken();
+    const [rates, setRates] = useState<IRate[]>([]);
+    const { setLoading } = useLoading();
+    const { token } = useToken();
 
     const [busqueda, setBusqueda] = useState('');
 
@@ -30,6 +33,7 @@ export const ModalInfo: React.FC<ModalProps> = ({ visible, setVisible }) => {
             if (visible) return;
             setBusqueda('');
             loadComunas();
+            loadRates();
         };
         abrirModal();
     }, [visible]);
@@ -40,10 +44,23 @@ export const ModalInfo: React.FC<ModalProps> = ({ visible, setVisible }) => {
             setLoading(true);
             const { data } = await listComunas(token);
             setComunas(data);
+            //setFiltradas(data);
+        } catch (error) {
+            console.log(error)
+        } finally {
+            setLoading(false);
+        }
+    }
+
+    const loadRates = async () => {
+        try {
+            setLoading(true);
+            const { data } = await listRates(token);
+            setRates(data);
             setFiltradas(data);
         } catch (error) {
             console.log(error)
-        }finally {
+        } finally {
             setLoading(false);
         }
     }
@@ -52,8 +69,8 @@ export const ModalInfo: React.FC<ModalProps> = ({ visible, setVisible }) => {
 
     const filtrar = (texto: string) => {
         setBusqueda(texto);
-        const resultado = comunas.filter(c =>
-            c.name.toLowerCase().includes(texto.toLowerCase())
+        const resultado = rates.filter(c =>
+            c.nameService.toLowerCase().includes(texto.toLowerCase())
         );
         setFiltradas(resultado);
     };
@@ -63,22 +80,24 @@ export const ModalInfo: React.FC<ModalProps> = ({ visible, setVisible }) => {
             <Modal visible={visible} animationType="slide" transparent>
                 <View style={styles.modalOverlay}>
                     <View style={styles.modalContent}>
-                        <Text style={styles.modalTitle}>Buscar comuna</Text>
+                        <Text style={styles.modalTitle}>Buscar Tarifas</Text>
                         <TextInput
                             style={styles.input}
-                            placeholder="Escribe una comuna..."
+                            placeholder="Busqueda..."
+                            placeholderTextColor="#7f8c8d"
                             value={busqueda}
                             onChangeText={filtrar}
                         />
-                        {busqueda && <FlatList
+                        <FlatList
                             data={filtradas}
-                            keyExtractor={(item) => item.name}
+                            keyExtractor={(item) => item.nameService}
                             renderItem={({ item }) => (
                                 <TouchableOpacity style={styles.item}>
-                                    <Text>{item.name}</Text>
+                                    <Text>{item.nameService}</Text>
+                                    <Text>{item.price}</Text>
                                 </TouchableOpacity>
                             )}
-                        />}
+                        />
                         <TouchableOpacity onPress={cerrarModal} style={styles.closeButton}>
                             <Text style={styles.closeText}>Cerrar</Text>
                         </TouchableOpacity>
@@ -144,7 +163,10 @@ const styles = StyleSheet.create({
     item: {
         paddingVertical: 10,
         borderBottomWidth: 1,
-        borderColor: '#eee'
+        borderColor: '#eee',
+        flexDirection: 'row',
+        flexWrap: 'wrap',
+        justifyContent: 'space-between',
     },
     closeButton: {
         marginTop: 10,

@@ -6,12 +6,16 @@ export const login = (data: UserData) =>
         { email: data.email, password: data.password });
 export const register = (data: UserData) =>
     api.post('/user/register', data);
-export const disable = (data: UserData, token:string) =>
+export const disable = (data: UserData, token: string) =>
     api.put('/user/disable', { id: data.id },
         {
-    headers: { Authorization: `Bearer ${token}` }
-}    );
+            headers: { Authorization: `Bearer ${token}` }
+        });
 export const update = (data: UserData, token: string) =>
     api.put<UserData>('/user', data, {
         headers: { Authorization: `Bearer ${token}` }
     })
+
+export const recoveryPass =(email:string)=>{
+    return api.get(`/user/recovery/${email}`);
+}

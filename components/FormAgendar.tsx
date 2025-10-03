@@ -45,6 +45,7 @@ const FormAgendar = ({ user }: FormAgendarProps) => {
     const [rates, setRates] = useState<IRate[]>([]);
     const [isFragile, setIsFragile] = useState(false);
     const [isReturnable, setIsReturnable] = useState(false);
+    const [isExchange, setExchange] = useState(false);
     const [visible, setVisible] = useState(false);
     const [file, setFile] = useState<DocumentPicker.DocumentPickerResult | null>(null);
     const [fileName, setFileName] = useState<string | null>(null);
@@ -58,6 +59,9 @@ const FormAgendar = ({ user }: FormAgendarProps) => {
     useEffect(() => {
         const loadRates = async () => {
             setLoading(true);
+            setIsFragile(false);
+            setIsReturnable(false);
+            setExchange(false);
             try {
                 const { data } = await listRates(token);
                 setRates(data);
@@ -127,10 +131,11 @@ const FormAgendar = ({ user }: FormAgendarProps) => {
 
         setLoading(true);
         try {
-            const stopToSend = {
+            const stopToSend: StopData = {
                 ...stop,
                 fragile: isFragile,
                 devolution: isReturnable,
+                exchange: isExchange,
                 sellId: user.Sells?.[0]?.id
             };
 
@@ -224,10 +229,11 @@ const FormAgendar = ({ user }: FormAgendarProps) => {
         }
         setLoading(true);
         try {
-            const stopToSend = {
+            const stopToSend: StopData = {
                 ...stop,
                 fragile: isFragile,
                 devolution: isReturnable,
+                exchange: isExchange,
                 sellId: user.Sells?.[0]?.id
             };
 
@@ -311,8 +317,22 @@ const FormAgendar = ({ user }: FormAgendarProps) => {
                     <Text style={styles.label}>¿Es devolución?</Text>
                     <Switch
                         value={isReturnable}
-                        onValueChange={setIsReturnable}
+                        onValueChange={(s) => {
+                            setIsReturnable(s);
+                            setExchange(!s);
+                        }}
                         thumbColor={isReturnable ? '#c4d111ff' : '#ccc'}
+                    />
+                </View>
+                <View style={styles.optionRow}>
+                    <Text style={styles.label}>¿Es Cambio?</Text>
+                    <Switch
+                        value={isExchange}
+                        onValueChange={(s) => {
+                            setIsReturnable(!s);
+                            setExchange(s);
+                        }}
+                        thumbColor={isExchange ? '#1ab827ff' : '#ccc'}
                     />
                 </View>
             </View>
@@ -406,8 +426,9 @@ const styles = StyleSheet.create({
     },
     buttonRow: {
         flexDirection: 'row',
+        flexWrap: 'wrap',
         justifyContent: 'space-around',
-        marginVertical: 16,
+        marginVertical: 10,
     },
     tagButton: {
         paddingVertical: 10,
@@ -447,6 +468,7 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         justifyContent: 'space-between',
         alignItems: 'center',
+        marginBottom: 8
     },
     actionButton: {
         flexDirection: 'row',
@@ -467,7 +489,8 @@ const styles = StyleSheet.create({
         marginTop: 15,
         fontSize: 14,
         color: '#34495E',
-    }, modalOverlay: {
+    },
+    modalOverlay: {
         flex: 1,
         justifyContent: 'center',
         alignItems: 'center',
